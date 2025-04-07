@@ -10,3 +10,5 @@ wheels/
 .venv
 .env
 .idea
+credentials.json
+shops.json
