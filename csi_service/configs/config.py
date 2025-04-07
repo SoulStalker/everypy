@@ -11,8 +11,14 @@ class DatabaseConfig:
 
 
 @dataclass
+class KafkaConfig:
+    broker: str
+
+
+@dataclass
 class Config:
     db: DatabaseConfig
+    kafka: KafkaConfig
 
 
 def load_config(path: str | None = None) -> Config:
@@ -25,5 +31,9 @@ def load_config(path: str | None = None) -> Config:
             database=env('DB_URL'),
             db_user=env('DB_USER'),
             db_password=env('DB_PASSWORD')
-        )
+        ),
+        kafka=KafkaConfig(
+            broker=env('KAFKA_BROKER'),
+        ),
     )
+
