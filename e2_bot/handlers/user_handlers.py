@@ -42,3 +42,9 @@ async def contacts_command(message: Message, bot: Bot):
         chat_id=message.chat.id,
         text=LEXICON['/contacts'],
     )
+
+
+# Этот хендлер срабатывает на команду /unclosed
+@router.message(Command('unclosed'))
+async def unclosed_command(message: Message, bot: Bot):
+    pass

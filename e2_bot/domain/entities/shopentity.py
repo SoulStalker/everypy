@@ -2,6 +2,6 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Shop:
+class ShopEntity:
     number: int
     name: str
