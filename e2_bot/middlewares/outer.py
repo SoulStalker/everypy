@@ -19,7 +19,7 @@ class ShadowBanMiddleware(BaseMiddleware):
 
         user: User = data.get('event_from_user')
         if user is not None:
-            if not user.id in self.admins:
+            if user.id not in self.admins:
                 return
 
         return await handler(event, data)
