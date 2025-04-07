@@ -14,7 +14,7 @@ shops_fake_db = {
 }
 
 
-class JsonShops (IShopRepository):
+class JsonShops(IShopRepository):
     @staticmethod
     def get(number: int) -> Shop:
         with open("shops.json", "r", encoding="utf-8") as f:
@@ -26,12 +26,3 @@ class JsonShops (IShopRepository):
                         name=shop["address"],
                     )
 
-
-
-# with open("shops.json", "r", encoding="utf-8") as f:
-#     shops = json.load(f)
-#     for shop in shops:
-#         if shop["id"] == number
-#         print(shop)
-#         # if shop["number"] == str(2):
-#         #     print(shop)
