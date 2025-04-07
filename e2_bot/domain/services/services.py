@@ -1,11 +1,18 @@
-from e2_bot.domain.entities.shift_message import UnclosedShiftMessage
-from e2_bot.domain.repositories.reposotory import IUnclosedMessageRepository
+from e2_bot.domain.entities.shift_message import UnclosedShiftMessageEntity
+from e2_bot.domain.repositories import IUnclosedMessageRepository, IShopRepository
 
 
 class UnclosedMessageService:
     def __init__(self, repository: IUnclosedMessageRepository):
         self.repository = repository
 
-    def format_message(self, msg: UnclosedShiftMessage):
-        return self.repository.format_message(msg)
+    def get_formated_message(self, msg: UnclosedShiftMessageEntity):
+        return self.repository.get_formated_message(msg)
 
+
+class ShopService:
+    def __init__(self, repository: IShopRepository):
+        self.repository = repository
+
+    def get(self, number: int):
+        return self.repository.get(number)

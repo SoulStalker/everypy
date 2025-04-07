@@ -1,7 +1,13 @@
-from e2_bot.domain.entities.shift_message import UnclosedShiftMessage
+from e2_bot.domain.entities import UnclosedShiftMessageEntity, Shop
 
 
 class IUnclosedMessageRepository:
     @staticmethod
-    def format_message(msg: UnclosedShiftMessage):
+    def get_formated_message(msg: UnclosedShiftMessageEntity) -> str:
         return NotImplemented
+
+
+class IShopRepository:
+    @staticmethod
+    def get(number: int) -> Shop:
+        raise NotImplementedError
