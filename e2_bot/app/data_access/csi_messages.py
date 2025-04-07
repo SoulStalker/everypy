@@ -1,4 +1,3 @@
-from e2_bot.domain.entities import USMessageEntity
 from e2_bot.domain.repositories import IUnclosedMessageRepository
 
 

@@ -1,9 +1,9 @@
 from enum import Enum
 
 
-class Command(Enum):
+class UserCommand(Enum):
     START = "/start"
     HELP = "/help"
-    SETTINGS = "/settings"
+    SERVICE = "/service"
     CONTACTS = "/contacts"
     UNCLOSED = "/unclosed"

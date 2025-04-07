@@ -14,13 +14,18 @@ class TgBot:
 
 
 @dataclass
+class KafkaConfig:
+    broker: str
+
+
+@dataclass
 class Config:
     tg_bot: TgBot
     db: DatabaseConfig
+    kafka: KafkaConfig
 
 
 def load_config(path: str | None = None) -> Config:
-
     env: Env = Env()
     env.read_env()
 
@@ -31,5 +36,8 @@ def load_config(path: str | None = None) -> Config:
         ),
         db=DatabaseConfig(
             database=env('DB_URL'),
-        )
+        ),
+        kafka=KafkaConfig(
+            broker=env('KAFKA_BROKER'),
+        ),
     )

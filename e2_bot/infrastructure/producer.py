@@ -10,5 +10,5 @@ class KafkaMessageSender(MessageSender):
             value_serializer=lambda v: json.dumps(v).encode("utf-8")
         )
 
-    def send(self, topic: str, message: str) -> None:
+    def send(self, topic: str, message: dict) -> None:
         self.producer.send(topic, message)

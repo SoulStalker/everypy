@@ -1,3 +1,3 @@
-from .user_command import Command
+from .user_command import UserCommand
 
-__all__ = ['Command']
+__all__ = ['UserCommand']

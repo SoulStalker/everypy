@@ -5,12 +5,14 @@ from aiogram.types import Message
 from e2_bot.infrastructure.producer import KafkaMessageSender
 from e2_bot.lexicon import LEXICON
 from e2_bot.app.constants import KafkaTopics
-from e2_bot.app.ports.messaging import MessageSender
-from e2_bot.domain.value_objects import Command
+from e2_bot.domain.value_objects import UserCommand
+from e2_bot.configs import load_config
 
+config = load_config('.env')
 
 router = Router()
-producer = KafkaMessageSender("192.168.10.102:9092")
+producer = KafkaMessageSender(config.kafka.broker)
+
 
 # Этот хендлер срабатывает на команду /start и создает пользователя в базе данных
 @router.message(CommandStart())
@@ -27,7 +29,7 @@ async def help_command(message: Message, bot: Bot):
     await bot.send_message(
         chat_id=message.chat.id,
         text=LEXICON['/help'],
-        )
+    )
 
 
 # Этот хендлер срабатывает на команду /service
@@ -51,6 +53,6 @@ async def contacts_command(message: Message, bot: Bot):
 # Этот хендлер срабатывает на команду /unclosed
 @router.message(Command('unclosed'))
 async def unclosed_command(message: Message, bot: Bot):
-    payload = {"chat_id": message.chat.id, "command": Command.UNCLOSED.value}
+    payload = {"chat_id": message.chat.id, "command": UserCommand.UNCLOSED.name}
     print(payload)
-    producer.send(KafkaTopics.USER_COMMANDS, payload)
+    producer.send(KafkaTopics.USER_COMMANDS.value, payload)
