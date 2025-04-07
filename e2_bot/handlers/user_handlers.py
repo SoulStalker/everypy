@@ -2,11 +2,15 @@ from aiogram import Router, Bot
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
+from e2_bot.infrastructure.producer import KafkaMessageSender
 from e2_bot.lexicon import LEXICON
+from e2_bot.app.constants import KafkaTopics
+from e2_bot.app.ports.messaging import MessageSender
+from e2_bot.domain.value_objects import Command
 
 
 router = Router()
-
+producer = KafkaMessageSender("192.168.10.102:9092")
 
 # Этот хендлер срабатывает на команду /start и создает пользователя в базе данных
 @router.message(CommandStart())
@@ -47,4 +51,6 @@ async def contacts_command(message: Message, bot: Bot):
 # Этот хендлер срабатывает на команду /unclosed
 @router.message(Command('unclosed'))
 async def unclosed_command(message: Message, bot: Bot):
-    pass
+    payload = {"chat_id": message.chat.id, "command": Command.UNCLOSED.value}
+    print(payload)
+    producer.send(KafkaTopics.USER_COMMANDS, payload)
