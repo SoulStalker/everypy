@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import calendar
 import random
@@ -17,10 +16,10 @@ async def get_message(analyzer, period):
     strongs = []
     poos = {}
 
-    strong = f'   \U0001F4AA\n'
-    good = f'   \U0001F44D\n'
-    little = f'   \U0001F90F\n'
-    poo = f'   \U0001F4A9\n'
+    strong = '   \U0001F4AA\n'
+    good = '   \U0001F44D\n'
+    little = '   \U0001F90F\n'
+    poo = '   \U0001F4A9\n'
     if period == 'сегодня':
         multiplier = 1
         await analyzer.get_results()
@@ -116,33 +115,26 @@ def bad_work(username):
     return random.choice(mess)
 
 
-# async def main():
-#     analyzer = DataAnalyzer(session_maker)
-#     await analyzer.get_results()
-#     await analyzer.get_total_open_tickets()
-#
-#     message, finish = await get_message(analyzer, 'сегодня')
-#     message += f'\n\nОткрытых заявок осталось: {analyzer.total_open[0][0]}\n\n'
-#     message += f'Самая старая заявка {analyzer.total_open[0][1]}'
-#     logger.info(message)
-#     logger.info(finish)
-#
-#     # если сегодня воскресенье
-#     if datetime.datetime.today().weekday() == 6:
-#         message, finish = get_message(analyzer, 'месяц')
-#
-#         logger.info(message)
-#         logger.info(finish)
-#
-#     # если сегодня последний день месяца
-#     today = datetime.date.today()
-#     is_last_day_of_month = today.day == calendar.monthrange(today.year, today.month)[1]
-#     if is_last_day_of_month:
-#         message, finish = get_message(analyzer, 'месяц')
-#
-#         logger.debug(message)
-#         logger.info(finish)
+async def get_stats():
+    analyzer = DataAnalyzer(session_maker)
+    await analyzer.get_results()
+    await analyzer.get_total_open_tickets()
 
+    message, finish = await get_message(analyzer, 'сегодня')
+    message += f'\n\nОткрытых заявок осталось: {analyzer.total_open[0][0]}\n\n'
+    message += f'Самая старая заявка {analyzer.total_open[0][1]}'
+    logger.info(message)
+    logger.info(finish)
 
-# if __name__ == "__main__":
-#     asyncio.run(main())
+    # если сегодня воскресенье
+    if datetime.datetime.today().weekday() == 6:
+        message, finish = get_message(analyzer, 'месяц')
+
+        return message, finish
+
+    # если сегодня последний день месяца
+    today = datetime.date.today()
+    is_last_day_of_month = today.day == calendar.monthrange(today.year, today.month)[1]
+    if is_last_day_of_month:
+        message, finish = get_message(analyzer, 'месяц')
+        return message, finish

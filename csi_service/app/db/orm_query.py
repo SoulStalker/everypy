@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 from typing import Any, Sequence
 
-from sqlalchemy import select, Row, RowMapping, func, case, not_
+from sqlalchemy import select, Row, RowMapping, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import Shifts, Purchases
