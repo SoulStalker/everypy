@@ -2,8 +2,11 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 
+from e2_bot.app.constants import KafkaTopics
 from e2_bot.configs import load_config
 from e2_bot.handlers import router
+from e2_bot.handlers.kafka_handler import build_kafka_handler
+from e2_bot.infrastructure.consumer import KafkaMessageReceiver
 from e2_bot.keyboards import set_main_menu
 from e2_bot.middlewares import ShadowBanMiddleware
 
@@ -17,6 +20,19 @@ async def main():
     dp.include_router(router)
 
     dp.update.middleware(ShadowBanMiddleware(config.tg_bot.admin_ids))
+
+    # Инициализируем Kafka receiver
+    kafka_receiver = KafkaMessageReceiver(
+        topic=KafkaTopics.CSI_RESPONSES.value,
+        bootstrap_servers=config.kafka.broker,
+        group_id="csi_service"
+    )
+
+    # Передаём боту хендлер, который будет обрабатывать сообщения из Kafka
+    handler = build_kafka_handler(bot)
+
+    # Запускаем консюмера в фоне
+    await asyncio.create_task(kafka_receiver.consume(handler))
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

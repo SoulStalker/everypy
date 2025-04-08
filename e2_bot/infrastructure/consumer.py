@@ -1,3 +1,5 @@
+import asyncio
+
 from kafka import KafkaConsumer
 import json
 from e2_bot.app.ports.messaging import MessageReceiver
@@ -12,6 +14,11 @@ class KafkaMessageReceiver(MessageReceiver):
             value_deserializer=lambda v: json.loads(v.decode("utf-8"))
         )
 
-    def consume(self, handler: callable) -> None:
+    async def consume(self, handler: callable):
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, self._consume_blocking, handler)
+
+    def _consume_blocking(self, handler: callable):
+        print("Kafka consumer started...")
         for message in self.consumer:
             handler(message.value)

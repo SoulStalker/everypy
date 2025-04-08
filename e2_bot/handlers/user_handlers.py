@@ -54,5 +54,4 @@ async def contacts_command(message: Message, bot: Bot):
 @router.message(Command('unclosed'))
 async def unclosed_command(message: Message, bot: Bot):
     payload = {"chat_id": message.chat.id, "command": UserCommand.UNCLOSED.name}
-    print(payload)
     producer.send(KafkaTopics.USER_COMMANDS.value, payload)
