@@ -1,5 +1,7 @@
 from kafka import KafkaProducer
 import json
+from loguru import logger
+
 from e2_bot.app.ports.messaging import MessageSender
 
 
@@ -11,4 +13,5 @@ class KafkaMessageSender(MessageSender):
         )
 
     def send(self, topic: str, message: dict) -> None:
+        logger.debug(f"Sending message {message.keys()} to {topic}")
         self.producer.send(topic, message)

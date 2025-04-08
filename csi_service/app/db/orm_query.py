@@ -1,6 +1,5 @@
 from collections import defaultdict
 from datetime import date, timedelta
-from pprint import pprint
 from typing import Any, Sequence
 
 from sqlalchemy import select, Row, RowMapping, func, case, not_
@@ -41,7 +40,7 @@ async def get_results_by_shop(session: AsyncSession, report_day=date.today()):
         result = await async_session.execute(stmt)
 
         rows = result.fetchall()
-        # print(rows)
+
         for row in rows:
             shift = {
                 'shop_index': row[0],
@@ -74,6 +73,5 @@ async def get_results_by_shop(session: AsyncSession, report_day=date.today()):
             total_summary['state'].update(item['state'])
 
         combined_dict['total_summary'] = total_summary
-        pprint(combined_dict)
     return combined_dict
 

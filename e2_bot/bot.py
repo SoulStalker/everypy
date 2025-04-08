@@ -29,10 +29,12 @@ async def main():
     )
 
     # Передаём боту хендлер, который будет обрабатывать сообщения из Kafka
-    handler = build_kafka_handler(bot)
+    # main.py
+    loop = asyncio.get_running_loop()
+    handler = build_kafka_handler(bot, loop)
 
     # Запускаем консюмера в фоне
-    await asyncio.create_task(kafka_receiver.consume(handler))
+    asyncio.create_task(kafka_receiver.consume(handler))
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

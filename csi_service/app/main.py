@@ -1,5 +1,7 @@
 import asyncio
 
+from loguru import logger
+
 from csi_service.app.constants import KafkaTopics
 from csi_service.app.db.engine import session_maker
 from csi_service.app.db.orm_query import get_unclosed_shifts
@@ -17,7 +19,7 @@ async def process_message(msg: dict):
 
     # Проверяем, что команда допустимая
     if command not in [cmd.name for cmd in UserCommands]:
-        print(f"Недопустимая команда: {command}")
+        logger.error(f"Недопустимая команда: {command}")
         return
 
     # Получаем результаты запроса
@@ -28,13 +30,13 @@ async def process_message(msg: dict):
 
     response = {"chat_id": chat_id, "message": text}
     send_message(KafkaTopics.CSI_RESPONSES.value, response)
-    print(f"Отправлено сообщение: {response}")
+    logger.debug(f"Отправлено сообщение: {response}")
 
 
 async def main():
-    print("Запуск слушателя Kafka...")
+    logger.info("Запуск слушателя Kafka...")
     for msg in start_consumer(config.kafka.broker, "csi_service"):
-        print(f"Получено сообщение: {msg}")
+        logger.debug(f"Получено сообщение: {msg}")
         await process_message(msg)
 
 

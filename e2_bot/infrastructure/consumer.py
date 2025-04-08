@@ -1,5 +1,7 @@
 import asyncio
 
+from loguru import logger
+
 from kafka import KafkaConsumer
 import json
 from e2_bot.app.ports.messaging import MessageReceiver
@@ -19,7 +21,7 @@ class KafkaMessageReceiver(MessageReceiver):
         await loop.run_in_executor(None, self._consume_blocking, handler)
 
     def _consume_blocking(self, handler: callable):
-        print("Kafka consumer started...")
+        logger.info("Kafka consumer started...")
         for message in self.consumer:
-            print(f"Received message: {message}")
+            logger.debug(f"Received message: {message.value}")
             handler(message.value)
