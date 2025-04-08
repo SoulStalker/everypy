@@ -4,7 +4,7 @@ from loguru import logger
 
 from csi_service.app.constants import KafkaTopics
 from csi_service.app.db.engine import session_maker
-from csi_service.app.db.orm_query import get_unclosed_shifts
+from csi_service.app.db.orm_query import get_unclosed_shifts, get_results_by_shop
 from csi_service.app.user_commands import UserCommands
 from csi_service.configs import load_config
 from csi_service.infrastructure.consumer import start_consumer
@@ -22,15 +22,26 @@ async def process_message(msg: dict):
         logger.error(f"Недопустимая команда: {command}")
         return
 
+    logger.debug(command)
+    response = {"chat_id": chat_id, "command": command, "content": "unknown command"}
     # Получаем результаты запроса
-    unclosed_shifts = await get_unclosed_shifts(session_maker())
-    text = {}
-    for shift in unclosed_shifts:
-        text.setdefault(shift.shopindex, []).append(shift.cashnum)
+    if command == UserCommands.UNCLOSED.name:
+        logger.debug("Unclosed command")
+        unclosed_shifts = await get_unclosed_shifts(session_maker())
+        text = {}
+        for shift in unclosed_shifts:
+            text.setdefault(shift.shopindex, []).append(shift.cashnum)
 
-    response = {"chat_id": chat_id, "message": text}
+        response["content"] = text
+
+    elif command == UserCommands.TOTAL.name:
+            total = await get_results_by_shop(session_maker())
+            summary = total.get('total_summary', 0)
+            summary["state"] = str(summary["state"])
+            response["content"] = summary
+
     send_message(KafkaTopics.CSI_RESPONSES.value, response)
-    logger.debug(f"Отправлено сообщение: {response}")
+    logger.debug(f"Отправлено сообщение в топик: {KafkaTopics.CSI_RESPONSES.value}")
 
 
 async def main():

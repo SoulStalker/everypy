@@ -5,7 +5,8 @@ LEXICON_COMMANDS: dict[str, str] = {
     UserCommand.HELP.value: 'Справка по работе бота',
     UserCommand.SERVICE.value: 'Настройка',
     UserCommand.CONTACTS.value: 'Контакты',
-    UserCommand.UNCLOSED.value: 'Незакрытые смены'
+    UserCommand.UNCLOSED.value: 'Незакрытые смены',
+    UserCommand.TOTAL.value: 'Итоги за день'
 }
 
 

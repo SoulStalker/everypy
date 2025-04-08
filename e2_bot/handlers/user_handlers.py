@@ -55,3 +55,10 @@ async def contacts_command(message: Message, bot: Bot):
 async def unclosed_command(message: Message, bot: Bot):
     payload = {"chat_id": message.chat.id, "command": UserCommand.UNCLOSED.name}
     producer.send(KafkaTopics.USER_COMMANDS.value, payload)
+
+
+# Этот хендлер срабатывает на команду /total
+@router.message(Command('total'))
+async def total_command(message: Message, bot: Bot):
+    payload = {"chat_id": message.chat.id, "command": UserCommand.TOTAL.name}
+    producer.send(KafkaTopics.USER_COMMANDS.value, payload)

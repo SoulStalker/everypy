@@ -67,7 +67,7 @@ async def get_results_by_shop(session: AsyncSession, report_day=date.today()):
         total_sum = sum(item['sum_by_checks'] for item in combined_dict.values())
         total_checks = sum(item['checks_count'] for item in combined_dict.values())
 
-        total_summary = {'sum_by_checks': total_sum, 'checks_count': total_checks, 'state': set()}
+        total_summary = {'sum_by_checks': float(total_sum), 'checks_count': total_checks, 'state': set()}
 
         for item in combined_dict.values():
             total_summary['state'].update(item['state'])

@@ -7,3 +7,4 @@ class UserCommand(Enum):
     SERVICE = "/service"
     CONTACTS = "/contacts"
     UNCLOSED = "/unclosed"
+    TOTAL = "/total"

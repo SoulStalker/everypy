@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass
 
 from e2_bot.domain.entities import ShopEntity
@@ -9,9 +10,23 @@ class USMessageEntity:
     cashes: [int]
 
     def format(self, shop: ShopEntity):
-        cashes = ",".join(map(str, self.cashes))
+        cashes = ", ".join(map(str, self.cashes))
         if len(self.cashes) == 1:
             formated_msg = f"{shop.name},\nне закрыта смена на кассе {cashes}"
         else:
             formated_msg = f"{shop.name},\nне закрыта смена на кассах {cashes}"
         return formated_msg
+
+
+@dataclass
+class TotalMessageEntity:
+    sum_by_checks: float
+    checks_count: int
+    state: str
+
+    def format(self):
+        formated_msg = f"Суммарный отчет за {datetime.date.today()}:\nЧеки: {self.checks_count} шт\nОборот: {self.sum_by_checks} руб. "
+        if self.state != "{0}":
+            return formated_msg
+        else:
+            return f"{formated_msg}\n(не во всех магазинах закрыты смены)."

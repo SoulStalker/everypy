@@ -1,4 +1,4 @@
-from e2_bot.domain.entities.shift_message import USMessageEntity
+from e2_bot.domain.entities.shift_message import USMessageEntity, TotalMessageEntity
 
 from e2_bot.app.services.shop_service import shop_service
 
@@ -17,6 +17,13 @@ class HandleIncomingAlert:
         return message.format(shop)
 
 
-# todo remove test
-hia = HandleIncomingAlert()
-print(hia.execute({"store_id": 40, "cashes": [1,2]}))
+class HandleTotalAlert:
+    @classmethod
+    def execute(cls, raw_data: dict):
+        sum_by_checks = raw_data["sum_by_checks"]
+        checks_count = raw_data["checks_count"]
+        state = raw_data["state"]
+        message = TotalMessageEntity(
+            sum_by_checks, checks_count, state
+        )
+        return message.format()
