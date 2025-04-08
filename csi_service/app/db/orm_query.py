@@ -58,7 +58,7 @@ async def get_results_by_shop(session: AsyncSession, report_day=date.today()):
 
         for shift in results_today:
             shop_index = shift['shop_index']
-            combined_dict[shop_index]['sum_by_checks'] += shift['sum_by_checks']
+            combined_dict[shop_index]['sum_by_checks'] += float(shift['sum_by_checks'])
             combined_dict[shop_index]['checks_count'] += shift['checks_count']
             combined_dict[shop_index]['state'].add(shift['state'])
 
@@ -73,5 +73,7 @@ async def get_results_by_shop(session: AsyncSession, report_day=date.today()):
             total_summary['state'].update(item['state'])
 
         combined_dict['total_summary'] = total_summary
+        for k, v in combined_dict.items():
+            v["state"] = str(v["state"])
     return combined_dict
 

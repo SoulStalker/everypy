@@ -30,3 +30,17 @@ class TotalMessageEntity:
             return formated_msg
         else:
             return f"{formated_msg}\n(не во всех магазинах закрыты смены)."
+
+
+@dataclass
+class ShopResultEntity:
+    sum_by_checks: float
+    checks_count: int
+    state: str
+
+    def format(self, shop: ShopEntity):
+        formated_msg = f"Отчет за {datetime.date.today()} {shop.name}:\nЧеки: {self.checks_count} шт\nОборот: {self.sum_by_checks} руб. "
+        if self.state != "{0}":
+            return formated_msg
+        else:
+            return f"{formated_msg}\n(в магазине не все смены закрыты)."

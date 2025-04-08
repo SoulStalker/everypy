@@ -1,4 +1,4 @@
-from e2_bot.domain.entities.shift_message import USMessageEntity, TotalMessageEntity
+from e2_bot.domain.entities.shift_message import USMessageEntity, TotalMessageEntity, ShopResultEntity
 
 from e2_bot.app.services.shop_service import shop_service
 
@@ -27,3 +27,28 @@ class HandleTotalAlert:
             sum_by_checks, checks_count, state
         )
         return message.format()
+
+
+class HandlerResultsAlert:
+    @classmethod
+    def execute(cls, raw_data: dict):
+        shop_id = raw_data["store_id"]
+        results = raw_data["results"]
+        if shop_id == "total_summary":
+            message = TotalMessageEntity(
+                sum_by_checks=results["sum_by_checks"],
+                checks_count=results["checks_count"],
+                state=results["state"],
+            )
+            return message.format()
+
+        shop = shop_service.get(shop_id)
+        results = raw_data["results"]
+
+        sum_by_checks = results["sum_by_checks"]
+        checks_count = results["checks_count"]
+        state = results["state"]
+        message = ShopResultEntity(
+            sum_by_checks, checks_count, state
+        )
+        return message.format(shop)

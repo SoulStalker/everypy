@@ -3,7 +3,7 @@ import asyncio
 from aiogram import Bot
 from loguru import logger
 
-from e2_bot.app.use_cases.handle_message import HandleIncomingAlert, HandleTotalAlert
+from e2_bot.app.use_cases.handle_message import HandleIncomingAlert, HandleTotalAlert, HandlerResultsAlert
 
 
 def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
@@ -30,6 +30,17 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                     bot.send_message(chat_id=chat_id, text=hta.execute(content)),
                     loop
                 )
+            case "RESULTS_BY_SHOP":
+                hsa = HandlerResultsAlert()
+                shifts_from_kafka = dict(message.get("content", "Получено сообщение"))
+                if chat_id:
+                    for data in shifts_from_kafka.items():
+                        payload = {"store_id": data[0], "results": data[1]}
+                        formatted_shift = hsa.execute(payload)
+                        asyncio.run_coroutine_threadsafe(
+                            bot.send_message(chat_id=chat_id, text=formatted_shift),
+                            loop
+                        )
             case _:
                 asyncio.run_coroutine_threadsafe(
                     bot.send_message(chat_id=chat_id, text="unknown command"),

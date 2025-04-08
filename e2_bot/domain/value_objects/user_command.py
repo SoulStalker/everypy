@@ -8,3 +8,4 @@ class UserCommand(Enum):
     CONTACTS = "/contacts"
     UNCLOSED = "/unclosed"
     TOTAL = "/total"
+    RESULTS_BY_SHOP = "/results_by_shop"

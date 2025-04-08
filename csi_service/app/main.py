@@ -22,24 +22,23 @@ async def process_message(msg: dict):
         logger.error(f"Недопустимая команда: {command}")
         return
 
-    logger.debug(command)
     response = {"chat_id": chat_id, "command": command, "content": "unknown command"}
     # Получаем результаты запроса
     if command == UserCommands.UNCLOSED.name:
-        logger.debug("Unclosed command")
         unclosed_shifts = await get_unclosed_shifts(session_maker())
-        text = {}
+        content = {}
         for shift in unclosed_shifts:
-            text.setdefault(shift.shopindex, []).append(shift.cashnum)
-
-        response["content"] = text
-
+            content.setdefault(shift.shopindex, []).append(shift.cashnum)
+        response["content"] = content
     elif command == UserCommands.TOTAL.name:
-            total = await get_results_by_shop(session_maker())
-            summary = total.get('total_summary', 0)
-            summary["state"] = str(summary["state"])
-            response["content"] = summary
-
+        total = await get_results_by_shop(session_maker())
+        summary = total.get('total_summary', 0)
+        summary["state"] = str(summary["state"])
+        response["content"] = summary
+    elif command == UserCommands.RESULTS_BY_SHOP.name:
+        results = await get_results_by_shop(session_maker())
+        logger.debug(results)
+        response["content"] = results
     send_message(KafkaTopics.CSI_RESPONSES.value, response)
     logger.debug(f"Отправлено сообщение в топик: {KafkaTopics.CSI_RESPONSES.value}")
 

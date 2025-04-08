@@ -62,3 +62,10 @@ async def unclosed_command(message: Message, bot: Bot):
 async def total_command(message: Message, bot: Bot):
     payload = {"chat_id": message.chat.id, "command": UserCommand.TOTAL.name}
     producer.send(KafkaTopics.USER_COMMANDS.value, payload)
+
+
+# Этот хендлер срабатывает на команду /results_by_shop
+@router.message(Command('results_by_shop'))
+async def results_by_shop_command(message: Message, bot: Bot):
+    payload = {"chat_id": message.chat.id, "command": UserCommand.RESULTS_BY_SHOP.name}
+    producer.send(KafkaTopics.USER_COMMANDS.value, payload)
