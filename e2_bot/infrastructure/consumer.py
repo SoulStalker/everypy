@@ -21,4 +21,5 @@ class KafkaMessageReceiver(MessageReceiver):
     def _consume_blocking(self, handler: callable):
         print("Kafka consumer started...")
         for message in self.consumer:
+            print(f"Received message: {message}")
             handler(message.value)
