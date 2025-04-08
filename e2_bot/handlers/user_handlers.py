@@ -69,3 +69,10 @@ async def total_command(message: Message, bot: Bot):
 async def results_by_shop_command(message: Message, bot: Bot):
     payload = {"chat_id": message.chat.id, "command": UserCommand.RESULTS_BY_SHOP.name}
     producer.send(KafkaTopics.USER_COMMANDS.value, payload)
+
+
+# Этот хендлер срабатывает на команду /otrs_stats
+@router.message(Command('otrs_stats'))
+async def otrs_stats_command(message: Message, bot: Bot):
+    payload = {"chat_id": message.chat.id, "command": UserCommand.OTRS_STATS.name}
+    producer.send(KafkaTopics.OTRS_STATS.value, payload)

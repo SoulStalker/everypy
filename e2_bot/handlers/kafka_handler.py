@@ -5,6 +5,7 @@ from loguru import logger
 
 from e2_bot.app.use_cases.handle_message import HandleIncomingAlert, HandleTotalAlert, HandlerResultsAlert
 from e2_bot.configs import load_config
+from e2_bot.domain.value_objects.user_command import UserCommand
 
 config = load_config()
 
@@ -17,7 +18,7 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
         content = message.get("content")
         logger.debug(f"Received message: {chat_id} {cmd} {content}")
         match cmd:
-            case "UNCLOSED":
+            case UserCommand.UNCLOSED.name:
                 shifts_from_kafka = dict(message.get("content", "Получено сообщение"))
                 hia = HandleIncomingAlert()
                 if chat_id:
@@ -28,13 +29,13 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                             bot.send_message(chat_id=chat_id, text=formatted_shift),
                             loop
                         )
-            case "TOTAL":
+            case UserCommand.TOTAL.name:
                 hta = HandleTotalAlert()
                 asyncio.run_coroutine_threadsafe(
                     bot.send_message(chat_id=chat_id, text=hta.execute(content)),
                     loop
                 )
-            case "RESULTS_BY_SHOP":
+            case UserCommand.RESULTS_BY_SHOP.name:
                 hsa = HandlerResultsAlert()
                 shifts_from_kafka = dict(message.get("content", "Получено сообщение"))
                 if chat_id:
@@ -45,7 +46,7 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                             bot.send_message(chat_id=chat_id, text=formatted_shift),
                             loop
                         )
-            case "OTRS_NOTIFICATIONS":
+            case UserCommand.OTRS_STATS.name:
                 chat_id = config.tg_bot.chat_id
                 asyncio.run_coroutine_threadsafe(
                     bot.send_message(chat_id=chat_id, text=content),

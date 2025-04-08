@@ -29,7 +29,7 @@ async def main():
     )
 
     otrs_receiver = KafkaMessageReceiver(
-        topic=KafkaTopics.OTRS_NOTIFICATIONS.value,
+        topic=KafkaTopics.OTRS_STATS.value,
         bootstrap_servers=config.kafka.broker,
         group_id="otrs_service"
     )
