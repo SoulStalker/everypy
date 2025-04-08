@@ -3,7 +3,7 @@ from environs import Env
 
 
 @dataclass
-class DatabaseConfig:
+class OtrsBaseConfig:
     database: str
     db_host: str
     db_user: str
@@ -17,7 +17,7 @@ class KafkaConfig:
 
 @dataclass
 class Config:
-    db: DatabaseConfig
+    db: OtrsBaseConfig
     kafka: KafkaConfig
 
 
@@ -26,11 +26,11 @@ def load_config(path: str | None = None) -> Config:
     env.read_env()
 
     return Config(
-        db=DatabaseConfig(
-            db_host=env('DB_HOST'),
-            database=env('DB_URL'),
-            db_user=env('DB_USER'),
-            db_password=env('DB_PASSWORD')
+        db=OtrsBaseConfig(
+            db_host=env('OTRS_DB_HOST'),
+            database=env('OTRS_DB_URL'),
+            db_user=env('OTRS_DB_USER'),
+            db_password=env('OTRS_DB_PASSWORD')
         ),
         kafka=KafkaConfig(
             broker=env('KAFKA_BROKER'),

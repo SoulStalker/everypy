@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from csi_service.configs import load_config
+from otrs_service.configs import load_config
 from .models import Base
 
 config = load_config('.env')
