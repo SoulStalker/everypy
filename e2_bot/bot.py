@@ -22,19 +22,27 @@ async def main():
     dp.update.middleware(ShadowBanMiddleware(config.tg_bot.admin_ids))
 
     # Инициализируем Kafka receiver
-    kafka_receiver = KafkaMessageReceiver(
+    csi_receiver = KafkaMessageReceiver(
         topic=KafkaTopics.CSI_RESPONSES.value,
         bootstrap_servers=config.kafka.broker,
         group_id="csi_service"
     )
 
+    otrs_receiver = KafkaMessageReceiver(
+        topic=KafkaTopics.OTRS_NOTIFICATIONS.value,
+        bootstrap_servers=config.kafka.broker,
+        group_id="otrs_service"
+    )
+
     # Передаём боту хендлер, который будет обрабатывать сообщения из Kafka
     # main.py
     loop = asyncio.get_running_loop()
-    handler = build_kafka_handler(bot, loop)
+    csi_handler = build_kafka_handler(bot, loop)
+    otrs_handler = build_kafka_handler(bot, loop)
 
     # Запускаем консюмера в фоне
-    asyncio.create_task(kafka_receiver.consume(handler))
+    asyncio.create_task(csi_receiver.consume(csi_handler))
+    asyncio.create_task(otrs_receiver.consume(otrs_handler))
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

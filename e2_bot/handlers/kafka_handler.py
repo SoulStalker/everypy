@@ -4,10 +4,14 @@ from aiogram import Bot
 from loguru import logger
 
 from e2_bot.app.use_cases.handle_message import HandleIncomingAlert, HandleTotalAlert, HandlerResultsAlert
+from e2_bot.configs import load_config
+
+config = load_config()
 
 
 def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
     def handler(message: dict):
+        logger.debug(f"Handling message: {message}")
         chat_id = message.get("chat_id")
         cmd = message.get("command")
         content = message.get("content")
@@ -41,9 +45,15 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                             bot.send_message(chat_id=chat_id, text=formatted_shift),
                             loop
                         )
+            case "OTRS_NOTIFICATIONS":
+                chat_id = config.tg_bot.chat_id
+                asyncio.run_coroutine_threadsafe(
+                    bot.send_message(chat_id=chat_id, text=content),
+                    loop
+                )
             case _:
                 asyncio.run_coroutine_threadsafe(
-                    bot.send_message(chat_id=chat_id, text="unknown command"),
+                    bot.send_message(chat_id=chat_id, text="unknown message"),
                     loop
                 )
     return handler
