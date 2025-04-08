@@ -76,3 +76,4 @@ async def results_by_shop_command(message: Message, bot: Bot):
 async def otrs_stats_command(message: Message, bot: Bot):
     payload = {"chat_id": message.chat.id, "command": UserCommand.OTRS_STATS.name}
     producer.send(KafkaTopics.OTRS_STATS.value, payload)
+    

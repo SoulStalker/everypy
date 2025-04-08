@@ -37,8 +37,8 @@ async def main():
         logger.debug(message)
         logger.info(finish)
 
-    send_message(KafkaTopics.OTRS_NOTIFICATIONS.value, {"command": "OTRS_NOTIFICATIONS", "content": message})
-    send_message(KafkaTopics.OTRS_NOTIFICATIONS.value, {"command": "OTRS_NOTIFICATIONS", "content": finish})
+    send_message(KafkaTopics.TG_BOT_MSGS.value, {"command": "OTRS_NOTIFICATIONS", "content": message})
+    send_message(KafkaTopics.TG_BOT_MSGS.value, {"command": "OTRS_NOTIFICATIONS", "content": finish})
 
 
 if __name__ == '__main__':

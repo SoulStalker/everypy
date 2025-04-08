@@ -39,8 +39,8 @@ async def process_message(msg: dict):
         results = await get_results_by_shop(session_maker())
         logger.debug(results)
         response["content"] = results
-    send_message(KafkaTopics.CSI_RESPONSES.value, response)
-    logger.debug(f"Отправлено сообщение в топик: {KafkaTopics.CSI_RESPONSES.value}")
+    send_message(KafkaTopics.TG_BOT_MSGS.value, response)
+    logger.debug(f"Отправлено сообщение в топик: {KafkaTopics.TG_BOT_MSGS.value}")
 
 
 async def main():

@@ -1,8 +1,11 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 from e2_bot.app.constants import KafkaTopics
+from e2_bot.app.services.notifcation_sender import send_otrs_notifications
 from e2_bot.configs import load_config
 from e2_bot.handlers import router
 from e2_bot.handlers.kafka_handler import build_kafka_handler
@@ -22,27 +25,36 @@ async def main():
     dp.update.middleware(ShadowBanMiddleware(config.tg_bot.admin_ids))
 
     # Инициализируем Kafka receiver
-    csi_receiver = KafkaMessageReceiver(
-        topic=KafkaTopics.CSI_RESPONSES.value,
+    kafka_receiver = KafkaMessageReceiver(
+        topic=KafkaTopics.TG_BOT_MSGS.value,
         bootstrap_servers=config.kafka.broker,
         group_id="csi_service"
     )
 
-    otrs_receiver = KafkaMessageReceiver(
-        topic=KafkaTopics.OTRS_STATS.value,
-        bootstrap_servers=config.kafka.broker,
-        group_id="otrs_service"
-    )
-
     # Передаём боту хендлер, который будет обрабатывать сообщения из Kafka
-    # main.py
     loop = asyncio.get_running_loop()
-    csi_handler = build_kafka_handler(bot, loop)
-    otrs_handler = build_kafka_handler(bot, loop)
+    kafka_handler = build_kafka_handler(bot, loop)
 
     # Запускаем консюмера в фоне
-    asyncio.create_task(csi_receiver.consume(csi_handler))
-    asyncio.create_task(otrs_receiver.consume(otrs_handler))
+    asyncio.create_task(kafka_receiver.consume(kafka_handler))
+
+    # 🕒 Настраиваем планировщик задач
+    scheduler = AsyncIOScheduler()
+
+    # Пример: 3 уведомления в день в определённое время
+    scheduler.add_job(
+        send_otrs_notifications,
+        CronTrigger(hour=13, minute=0),
+    )
+    scheduler.add_job(
+        send_otrs_notifications,
+        CronTrigger(hour=18, minute=0),
+    )
+    scheduler.add_job(
+        send_otrs_notifications,
+        CronTrigger(hour=23, minute=13),
+    )
+    scheduler.start()
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
