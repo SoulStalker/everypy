@@ -68,12 +68,12 @@ class HandleWhatsAppAlert:
         )
         match message.content_type:
             case ContentTypes.TEXT.value:
-                return message.format()
+                return "text", message.format()
             case ContentTypes.IMAGE.value:
                 return message.save_media()
             case ContentTypes.VIDEO.value:
-                return "video"
+                return "video", "video"
             case ContentTypes.AUDIO.value:
-                return "audio"
+                return "audio", "video"
             case _:
-                return "other"
+                return "other", "video"
