@@ -1,6 +1,7 @@
-from e2_bot.domain.entities.shift_message import USMessageEntity, TotalMessageEntity, ShopResultEntity
+from datetime import datetime
 
 from e2_bot.app.services.shop_service import shop_service
+from e2_bot.domain.entities.shift_message import USMessageEntity, TotalMessageEntity, ShopResultEntity, WhatsAppMessageEntity
 
 
 class HandleIncomingAlert:
@@ -52,3 +53,17 @@ class HandlerResultsAlert:
             sum_by_checks, checks_count, state
         )
         return message.format(shop)
+
+
+class HandleWhatsAppAlert:
+    @classmethod
+    def execute(cls, raw_data: dict):
+        message = WhatsAppMessageEntity(
+            sender=raw_data.get("sender", ""),
+            content=raw_data.get("content", ""),
+            group=raw_data.get("group", ""),
+            content_type=raw_data.get("content_type", ""),
+            time_stamp=datetime.fromisoformat(raw_data.get("timestamp")),
+            # time_stamp=raw_data.get("timestamp", ""),
+        )
+        return message.format()

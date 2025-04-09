@@ -1,9 +1,9 @@
 import asyncio
-
-from loguru import logger
+import json
 
 from kafka import KafkaConsumer
-import json
+from loguru import logger
+
 from e2_bot.app.ports.messaging import MessageReceiver
 
 
@@ -14,7 +14,7 @@ class KafkaMessageReceiver(MessageReceiver):
             topic,
             bootstrap_servers=bootstrap_servers,
             group_id=group_id,
-            value_deserializer=lambda v: json.loads(v.decode("utf-8"))
+            value_deserializer=kafka_deserializer  # Используем новую функцию
         )
 
     async def consume(self, handler: callable):
@@ -25,4 +25,18 @@ class KafkaMessageReceiver(MessageReceiver):
         logger.info(f"Kafka consumer started listening to topic '{self.topic}'...")
         for message in self.consumer:
             logger.debug(f"Received message from topic '{self.topic}'")
-            handler(message.value)
+            if message.value is not None:  # Дополнительная проверка
+                handler(message.value)
+            else:
+                logger.warning("Skipped None message")
+
+
+def kafka_deserializer(v):
+    if v is None:
+        logger.warning("Received message with None value")
+        return None
+    try:
+        return json.loads(v.decode("utf-8"))
+    except Exception as e:
+        logger.error(f"Deserialization error: {str(e)}", exc_info=True)
+        return None

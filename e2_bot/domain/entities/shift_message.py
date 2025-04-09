@@ -57,3 +57,22 @@ class ShopResultEntity:
             return formatted_msg
         else:
             return f"{formatted_msg}\n(в магазине не все смены закрыты)."
+
+
+@dataclass
+class WhatsAppMessageEntity:
+    sender: str
+    content: str
+    group: str
+    content_type: str
+    time_stamp: datetime.datetime
+
+    # time_stamp: str
+
+    def format(self):
+        sender = self.sender.split("@")[0]
+        time_stamp = self.time_stamp.strftime("%d.%m.%Y, %H:%M:%S")
+        # time_stamp = self.time_stamp.split("T")[0]
+        formatted_msg = f"Сообщение в группе {self.group}\n[{time_stamp}] {sender}: {self.content}"
+        print(formatted_msg)
+        return formatted_msg
