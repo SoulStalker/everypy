@@ -97,5 +97,4 @@ def get_data():
 
 if __name__ == "__main__":
     test_data = get_data()
-    logger.success(test_data)
-    logger.info(len(test_data))
+    logger.debug(test_data)

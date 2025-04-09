@@ -11,7 +11,6 @@ producer = KafkaProducer(bootstrap_servers=config.kafka.broker, value_serializer
 
 
 def send_message(topic: str, message: dict):
-    logger.info(config.kafka.broker)
     logger.debug(f"Sending message to topic {topic}")
     producer.send(topic, message)
     producer.flush()
