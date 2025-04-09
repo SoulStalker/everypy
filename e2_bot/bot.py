@@ -45,7 +45,7 @@ async def main():
     # Пример: 3 уведомления в день в определённое время
     scheduler.add_job(
         send_otrs_notifications,
-        CronTrigger(hour=13, minute=0),
+        CronTrigger(hour=13, minute=00),
     )
     scheduler.add_job(
         send_otrs_notifications,
@@ -53,7 +53,7 @@ async def main():
     )
     scheduler.add_job(
         send_otrs_notifications,
-        CronTrigger(hour=23, minute=13),
+        CronTrigger(hour=23, minute=30),
     )
     scheduler.start()
 

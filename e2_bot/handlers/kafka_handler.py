@@ -20,6 +20,7 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
         match cmd:
             case UserCommand.UNCLOSED.name:
                 shifts_from_kafka = dict(message.get("content", "Получено сообщение"))
+                logger.warning(shifts_from_kafka)
                 hia = HandleIncomingAlert()
                 if chat_id:
                     for data in shifts_from_kafka.items():

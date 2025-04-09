@@ -11,11 +11,16 @@ class USMessageEntity:
 
     def format(self, shop: ShopEntity):
         cashes = ", ".join(map(str, self.cashes))
-        if len(self.cashes) == 1:
-            formated_msg = f"{shop.name},\nне закрыта смена на кассе {cashes}"
+        if shop:
+            if len(self.cashes) == 0:
+                formatted_msg = f"Все смены закрыты"
+            elif len(self.cashes) == 1:
+                formatted_msg = f"{shop.name},\nне закрыта смена на кассе {cashes}"
+            else:
+                formatted_msg = f"{shop.name},\nне закрыта смена на кассах {cashes}"
         else:
-            formated_msg = f"{shop.name},\nне закрыта смена на кассах {cashes}"
-        return formated_msg
+            formatted_msg = f"Проблема с получением адреса магазина"
+        return formatted_msg
 
 
 @dataclass
@@ -25,11 +30,15 @@ class TotalMessageEntity:
     state: str
 
     def format(self):
-        formated_msg = f"Суммарный отчет за {datetime.date.today()}:\nЧеки: {self.checks_count} шт\nОборот: {self.sum_by_checks} руб. "
+        formatted_msg = (
+            f"Суммарный отчет за {datetime.date.today()}:\n"
+            f"Чеки: {self.checks_count} шт\n"
+            f"Оборот: {self.sum_by_checks:.2f} руб."
+        )
         if self.state != "{0}":
-            return formated_msg
+            return formatted_msg
         else:
-            return f"{formated_msg}\n(не во всех магазинах закрыты смены)."
+            return f"{formatted_msg}\n(не во всех магазинах закрыты смены)."
 
 
 @dataclass
@@ -39,8 +48,12 @@ class ShopResultEntity:
     state: str
 
     def format(self, shop: ShopEntity):
-        formated_msg = f"Отчет за {datetime.date.today()} {shop.name}:\nЧеки: {self.checks_count} шт\nОборот: {self.sum_by_checks} руб. "
+        formatted_msg = (
+            f"Суммарный отчет за {datetime.date.today()}:\n"
+            f"Чеки: {self.checks_count} шт\n"
+            f"Оборот: {self.sum_by_checks:.2f} руб."
+        )
         if self.state != "{0}":
-            return formated_msg
+            return formatted_msg
         else:
-            return f"{formated_msg}\n(в магазине не все смены закрыты)."
+            return f"{formatted_msg}\n(в магазине не все смены закрыты)."

@@ -129,7 +129,6 @@ async def get_stats():
     # если сегодня воскресенье
     if datetime.datetime.today().weekday() == 6:
         message, finish = get_message(analyzer, 'месяц')
-
         return message, finish
 
     # если сегодня последний день месяца
@@ -138,3 +137,5 @@ async def get_stats():
     if is_last_day_of_month:
         message, finish = get_message(analyzer, 'месяц')
         return message, finish
+
+    return message, finish
