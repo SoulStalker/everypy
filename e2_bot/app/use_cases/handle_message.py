@@ -2,6 +2,7 @@ from datetime import datetime
 
 from e2_bot.app.services.shop_service import shop_service
 from e2_bot.domain.entities.shift_message import USMessageEntity, TotalMessageEntity, ShopResultEntity, WhatsAppMessageEntity
+from e2_bot.domain.value_objects.content_types import ContentTypes
 
 
 class HandleIncomingAlert:
@@ -64,6 +65,15 @@ class HandleWhatsAppAlert:
             group=raw_data.get("group", ""),
             content_type=raw_data.get("content_type", ""),
             time_stamp=datetime.fromisoformat(raw_data.get("timestamp")),
-            # time_stamp=raw_data.get("timestamp", ""),
         )
-        return message.format()
+        match message.content_type:
+            case ContentTypes.TEXT.value:
+                return message.format()
+            case ContentTypes.IMAGE.value:
+                return message.save_media()
+            case ContentTypes.VIDEO.value:
+                return "video"
+            case ContentTypes.AUDIO.value:
+                return "audio"
+            case _:
+                return "other"
