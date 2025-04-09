@@ -1,14 +1,13 @@
 from aiogram import Router, Bot
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
-
 from loguru import logger
 
+from e2_bot.app.constants import KafkaTopics
+from e2_bot.configs import load_config
+from e2_bot.domain.value_objects import UserCommand
 from e2_bot.infrastructure.producer import KafkaMessageSender
 from e2_bot.lexicon import LEXICON
-from e2_bot.app.constants import KafkaTopics
-from e2_bot.domain.value_objects import UserCommand
-from e2_bot.configs import load_config
 
 config = load_config('.env')
 
@@ -79,4 +78,11 @@ async def otrs_stats_command(message: Message, bot: Bot):
     payload = {"chat_id": message.chat.id, "command": UserCommand.OTRS_STATS.name}
     logger.success(f"Sending message to topic {KafkaTopics.OTRS_STATS.name}")
     producer.send(KafkaTopics.OTRS_STATS.value, payload)
-    
+
+
+# Этот хендлер срабатывает на команду /equipment
+@router.message(Command('equipment'))
+async def otrs_stats_command(message: Message, bot: Bot):
+    payload = {"chat_id": message.chat.id, "command": UserCommand.EQUIPMENT.name}
+    logger.success(f"Sending message to topic {KafkaTopics.EQUIPMENT.name}")
+    producer.send(KafkaTopics.EQUIPMENT.value, payload)

@@ -10,3 +10,4 @@ class UserCommand(Enum):
     TOTAL = "/total"
     RESULTS_BY_SHOP = "/results_by_shop"
     OTRS_STATS = "/otrs_stats"
+    EQUIPMENT = "/equipment"
