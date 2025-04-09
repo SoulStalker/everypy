@@ -9,6 +9,7 @@ from e2_bot.app.ports.messaging import MessageReceiver
 
 class KafkaMessageReceiver(MessageReceiver):
     def __init__(self, topic: str, bootstrap_servers: str, group_id: str):
+        self.topic = topic
         self.consumer = KafkaConsumer(
             topic,
             bootstrap_servers=bootstrap_servers,
@@ -21,7 +22,7 @@ class KafkaMessageReceiver(MessageReceiver):
         await loop.run_in_executor(None, self._consume_blocking, handler)
 
     def _consume_blocking(self, handler: callable):
-        logger.info("Kafka consumer started...")
+        logger.info(f"Kafka consumer started listening to topic '{self.topic}'...")
         for message in self.consumer:
-            logger.debug("Received message")
+            logger.debug(f"Received message from topic '{self.topic}'")
             handler(message.value)

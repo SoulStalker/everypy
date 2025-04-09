@@ -14,7 +14,8 @@ config = load_config('.env')
 
 async def process_message(msg):
     logger.info(f"Обработка сообщения: {msg}")
-    await get_message(msg)
+    # Добавлю пока сюда мок
+    # stats, finish = f"такая какая то стата \nи такая какая то стата", "тут надпись о завершении"
     stats, finish = await get_stats()
 
     send_message(KafkaTopics.TG_BOT_MSGS.value, {"command": "OTRS_STATS", "content": stats})

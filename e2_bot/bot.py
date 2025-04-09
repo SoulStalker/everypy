@@ -1,5 +1,6 @@
 import asyncio
 
+import loguru
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger

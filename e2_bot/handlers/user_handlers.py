@@ -2,6 +2,8 @@ from aiogram import Router, Bot
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
+from loguru import logger
+
 from e2_bot.infrastructure.producer import KafkaMessageSender
 from e2_bot.lexicon import LEXICON
 from e2_bot.app.constants import KafkaTopics
@@ -75,5 +77,6 @@ async def results_by_shop_command(message: Message, bot: Bot):
 @router.message(Command('otrs_stats'))
 async def otrs_stats_command(message: Message, bot: Bot):
     payload = {"chat_id": message.chat.id, "command": UserCommand.OTRS_STATS.name}
+    logger.success(f"Sending message to topic {KafkaTopics.OTRS_STATS.name}")
     producer.send(KafkaTopics.OTRS_STATS.value, payload)
     
