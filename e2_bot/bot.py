@@ -1,12 +1,11 @@
 import asyncio
 
-import loguru
 from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from e2_bot.app.constants import KafkaTopics
-from e2_bot.app.services.notifcation_sender import send_otrs_notifications
+from e2_bot.app.services.notifcation_sender import send_otrs_notifications, send_unclosed_notifications
 from e2_bot.configs import load_config
 from e2_bot.handlers import router
 from e2_bot.handlers.kafka_handler import build_kafka_handler
@@ -50,6 +49,14 @@ async def main():
     scheduler.add_job(
         send_otrs_notifications,
         CronTrigger(hour=18, minute=0),
+    )
+    scheduler.add_job(
+        send_unclosed_notifications,
+        CronTrigger(hour=23, minute=15),
+    )
+    scheduler.add_job(
+        send_unclosed_notifications,
+        CronTrigger(hour=23, minute=25),
     )
     scheduler.add_job(
         send_otrs_notifications,
