@@ -33,15 +33,6 @@ async def help_command(message: Message, bot: Bot):
     )
 
 
-# Этот хендлер срабатывает на команду /service
-@router.message(Command('service'))
-async def support_command(message: Message, bot: Bot):
-    await bot.send_message(
-        chat_id=message.chat.id,
-        text=f"{LEXICON['/service']}"
-    )
-
-
 # Этот хендлер срабатывает на команду /contacts
 @router.message(Command('contacts'))
 async def contacts_command(message: Message, bot: Bot):

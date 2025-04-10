@@ -31,3 +31,6 @@ class WhatsAppGroup:
         if not re.fullmatch(r'[\w\s\-\@\.\,]+', value):
             raise ValueError("Имя группы может содержать буквы, цифры, пробелы и следующие символы: - @ . ,")
         self._group_name = value
+
+    def __str__(self):
+        return f'{self.group_id} {self.group_name}'

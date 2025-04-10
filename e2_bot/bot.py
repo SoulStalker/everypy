@@ -8,12 +8,14 @@ from e2_bot.app.constants import KafkaTopics
 from e2_bot.app.data_access.local_db import session_maker
 from e2_bot.app.services.notifcation_sender import send_otrs_notifications, send_unclosed_notifications
 from e2_bot.configs import load_config
-from e2_bot.handlers import router
+from e2_bot.handlers import service_router, user_router
 from e2_bot.handlers.kafka_handler import build_kafka_handler
-from e2_bot.handlers.service_handlers import test
 from e2_bot.infrastructure.consumer import KafkaMessageReceiver
 from e2_bot.keyboards import set_main_menu
 from e2_bot.middlewares import ShadowBanMiddleware, DbMiddleware
+
+
+# класс для состояний
 
 
 async def main():
@@ -24,9 +26,9 @@ async def main():
     # # Создаем базу
     # await drop_tables()
     # await create_tables()
-    await test()
 
-    dp.include_router(router)
+    dp.include_router(service_router)
+    dp.include_router(user_router)
 
     dp.update.middleware(ShadowBanMiddleware(config.tg_bot.admin_ids))
     dp.update.middleware(DbMiddleware(session_pool=session_maker))

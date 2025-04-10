@@ -9,59 +9,85 @@
 7. Удалить пользователя
 8. Изменить пользователя
 """
-import asyncio
+from aiogram import Router, Bot
+from aiogram.filters import Command, StateFilter
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.types import Message
+from loguru import logger
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from e2_bot.app.data_access.local_db import WAGroupRepository
 from e2_bot.app.data_access.local_db import session_maker
-#
-# from datetime import datetime, time, timedelta
-#
-# from aiogram import F, Router, Bot
-# from aiogram.filters import Command, CommandStart, StateFilter
-# from aiogram.fsm.context import FSMContext
-# from aiogram.types import Message, CallbackQuery, FSInputFile
-# from sqlalchemy.ext.asyncio import AsyncSession
-#
-# from keyboards.keyboards import (common_keyboard, create_tasks_keyboard, create_add_task_kb,
-#                                  create_del_tasks_kb, create_stop_task_kb, create_start_yes_no_kb,
-#                                  create_stats_kb, create_cancel_kb, create_del_or_edit_tasks_kb,
-#                                  create_edit_tasks_kb, create_service_kb, create_what_to_change_kb)
-# from lexicon.lexicon import LEXICON_RU
-# from filters.filters import (IsUsersDelTasks, ShowUsersTasks, IsStopTasks, IsInPeriods,
-#                              IsUsersEditTasks, IsCorrectSymbols)
-# from database.orm_query import (orm_get_user_by_id, orm_add_user, orm_add_task, orm_get_tasks_list,
-#                                 orm_remove_task, orm_update_work, orm_stop_work, orm_edit_task,
-#                                 orm_get_settings, orm_update_settings, orm_add_default_settings,
-#                                 orm_get_unclosed_work, orm_get_last_work, orm_get_task_by_id, orm_get_task_by_name)
-# from services.services import orm_get_day_stats
-# from bot import FSMGetTaskName
-#
-# router = Router()
-#
-#
-# # Этот хендлер срабатывает на команду /service
-# @router.message(Command('service'))
-# async def support_command(message: Message, session: AsyncSession, bot: Bot):
-#     user = await orm_get_user_by_id(session, message.from_user.id)
-#     current_settings = await orm_get_settings(session, user.id)
-#     if current_settings is None:
-#         await orm_add_default_settings(session, user.id)
-#     await bot.send_message(
-#         chat_id=message.chat.id,
-#         text=(f"{LEXICON_RU['/service']}{LEXICON_RU['current_work_duration']} "
-#               f"{current_settings.work_duration} {LEXICON_RU['minutes']}\n{LEXICON_RU['current_break_duration']} "
-#               f"{current_settings.break_duration} {LEXICON_RU['minutes']}"),
-#         reply_markup=create_service_kb()
-#     )
-from e2_bot.app.use_cases import AddGroupUseCase
+from e2_bot.app.use_cases import AddGroupUseCase, GetGroupUseCase
+
+router = Router()
+
+
+class FSMGetAddGroup(StatesGroup):
+    fill_gr_id = State()
+    fill_gr_name = State()
+
+
+@router.message(Command('service'))
+async def support_command(message: Message, bot: Bot, state: FSMContext):
+    await bot.send_message(
+        chat_id=message.chat.id,
+        text=f"Input group id",
+        # reply_markup=create_service_kb()
+    )
+    await state.set_state(FSMGetAddGroup.fill_gr_id)
+
+
+# Этот хендлер срабатывает на сообщения в FSM состоянии fill_gr_id
+@router.message(StateFilter(FSMGetAddGroup.fill_gr_id))
+async def process_add_gr(message: Message, bot: Bot, state: FSMContext):
+    await state.update_data(gr_id=message.text)
+    await bot.send_message(
+        chat_id=message.chat.id,
+        text=f"Input group name:",
+        # reply_markup=create_service_kb()
+    )
+    await state.set_state(FSMGetAddGroup.fill_gr_name)
+    # state_data = await state.get_data()
+    # gr_task_name = state_data['gr_name']
+    # repo = WAGroupRepository(session)
+    # uc = AddGroupUseCase(repo)
+    # await uc.execute(gr_task_name, "Gophers")
+
+
+# Этот хендлер срабатывает на сообщения в FSM состоянии fill_gr_id
+@router.message(StateFilter(FSMGetAddGroup.fill_gr_name))
+async def process_add_gr(message: Message, bot: Bot, session: AsyncSession, state: FSMContext):
+    await state.update_data(gr_name=message.text)
+    state_data = await state.get_data()
+    gr_id, gr_name = state_data['gr_id'], state_data['gr_name']
+    repo = WAGroupRepository(session)
+    uc = AddGroupUseCase(repo)
+    ug = GetGroupUseCase(repo)
+    logger.debug(gr_id, gr_name)
+    try:
+        await uc.execute(gr_id, gr_name)
+    except Exception as e:
+        await bot.send_message(
+            chat_id=message.chat.id,
+            text=str(e),
+            # reply_markup=create_service_kb()
+        )
+        await state.clear()
+        return
+    new_gr = await ug.execute(gr_id)
+    logger.debug(str(new_gr))
+    await bot.send_message(
+        chat_id=message.chat.id,
+        text=str(new_gr),
+        # reply_markup=create_service_kb()
+    )
+    await state.clear()
 
 
 async def test():
     async with session_maker() as session:
         repo = WAGroupRepository(session)
         uc = AddGroupUseCase(repo)
-        await uc.execute("120363417612072620@g.us", "Gophers")
-
-
-if __name__ == '__main__':
-    asyncio.run(test())
+        await uc.execute("2134@g.us", "test")
