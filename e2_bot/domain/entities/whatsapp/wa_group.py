@@ -16,8 +16,9 @@ class WhatsAppGroup:
     @group_id.setter
     def group_id(self, value):
         # Проверка, что group_id соответствует формату 18 цифр + @g.us
-        if not re.fullmatch(r'\d{18}@g\.us', value):
-            raise ValueError("ID группы должен быть в формате 18 цифр, за которыми следует '@g.us'.")
+        if not re.fullmatch(r'^\d+@g\.us$', value):
+            print(repr(value))
+            raise ValueError("ID группы должен быть в формате любого количества цифр, за которыми следует '@g.us'.")
         self._group_id = value
 
     @property

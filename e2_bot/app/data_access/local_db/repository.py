@@ -1,26 +1,20 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from e2_bot.domain.entities import WhatsAppContact
+from e2_bot.domain.entities import WhatsAppContact, WhatsAppGroup
 from e2_bot.domain.repositories import IWAContactRepository, IWAGroupRepository
-
+from .mappers import gr_model_to_dto, ct_model_to_dto, ct_dto_to_model, gr_dto_to_model
 from .models import Group, Contact
 
 
 class WAContactRepository(IWAContactRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
-        self.wa_contact = Contact  # Предполагается, что это модель SQLAlchemy
+        self.wa_contact = Contact
 
     async def get(self, number: int) -> WhatsAppContact | None:
         result = await self.session.get(self.wa_contact, number)
         if result:
-            return WhatsAppContact(
-                phone_number=result.phone_number,
-                first_name=result.first_name,
-                last_name=result.last_name,
-                email=result.email,
-                telegram_id=result.telegram_id
-            )
+            return ct_model_to_dto(result)
         return None
 
     async def get_all(self):
@@ -28,21 +22,23 @@ class WAContactRepository(IWAContactRepository):
         pass
 
     async def add(self, contact: WhatsAppContact):
-        model = self.wa_contact(
-            phone_number=contact.phone_number,
-            first_name=contact.first_name,
-            last_name=contact.last_name,
-            email=contact.email,
-            telegram_id=contact.telegram_id
-        )
+        model = ct_dto_to_model(contact)
         self.session.add(model)
         await self.session.commit()
-        await self.session.refresh(model)  # если нужно обновить модель
+        await self.session.refresh(model)
 
 
 class WAGroupRepository(IWAGroupRepository):
-    wa_group = Group
-
     def __init__(self, session: AsyncSession):
         self.session = session
+        self.wa_group = Group
 
+    async def get(self, number: int) -> WhatsAppGroup:
+        model = await self.session.get(self.wa_group, number)
+        return gr_model_to_dto(model)
+
+    async def add(self, gr: WhatsAppGroup):
+        wa_group = gr_dto_to_model(gr)
+        self.session.add(wa_group)
+        await self.session.commit()
+        await self.session.refresh(wa_group)

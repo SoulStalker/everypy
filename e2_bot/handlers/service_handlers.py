@@ -9,7 +9,10 @@
 7. Удалить пользователя
 8. Изменить пользователя
 """
-# import asyncio
+import asyncio
+
+from e2_bot.app.data_access.local_db import WAGroupRepository
+from e2_bot.app.data_access.local_db import session_maker
 #
 # from datetime import datetime, time, timedelta
 #
@@ -50,3 +53,15 @@
 #               f"{current_settings.break_duration} {LEXICON_RU['minutes']}"),
 #         reply_markup=create_service_kb()
 #     )
+from e2_bot.app.use_cases import AddGroupUseCase
+
+
+async def test():
+    async with session_maker() as session:
+        repo = WAGroupRepository(session)
+        uc = AddGroupUseCase(repo)
+        await uc.execute("120363417612072620@g.us", "Gophers")
+
+
+if __name__ == '__main__':
+    asyncio.run(test())

@@ -1,6 +1,8 @@
-from sqlalchemy.future import select
-from sqlalchemy import func, text, cast, Date
 from datetime import datetime
+
+from sqlalchemy import func, text, cast, Date
+from sqlalchemy.exc import DBAPIError
+from sqlalchemy.future import select
 
 # from database import db
 from .models import Ticket, User
@@ -31,9 +33,15 @@ class DataAnalyzer:
                 ).order_by(
                     text('count DESC')
                 ).limit(100)
-
-                result = await session.execute(query)
-                self.results = result.all()
+                try:
+                    result = await session.execute(query)
+                    self.results = result.all()
+                except DBAPIError as e:
+                    if "connection was closed" in str(e):
+                        await session.close()  # Закройте сессию и переподключитесь
+                        result = await session.execute(query)
+                        self.results = result.all()
+                    raise
 
     async def get_total_open_tickets(self):
         async with self.session_maker() as session:
