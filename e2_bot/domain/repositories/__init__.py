@@ -1,3 +1,3 @@
-from .reposotory import IShopRepository, IUnclosedMessageRepository
+from .reposotory import IShopRepository, IUnclosedMessageRepository, IWAGroupRepository, IWAContactRepository
 
-__all__ = ['IShopRepository', 'IUnclosedMessageRepository']
+__all__ = ['IShopRepository', 'IUnclosedMessageRepository', 'IWAGroupRepository', 'IWAContactRepository']

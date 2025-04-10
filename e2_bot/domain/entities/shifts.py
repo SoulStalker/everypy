@@ -1,9 +1,5 @@
-import base64
-import datetime
 from dataclasses import dataclass
-from pathlib import Path
 
-from loguru import logger
 
 from e2_bot.domain.entities import ShopEntity
 
@@ -20,11 +16,11 @@ class USMessageEntity:
         cashes = ", ".join(map(str, self.cashes))
         if shop:
             if len(self.cashes) == 0:
-                formatted_msg = f"Все смены закрыты"
+                formatted_msg = "Все смены закрыты"
             elif len(self.cashes) == 1:
                 formatted_msg = f"{shop.name},\nне закрыта смена на кассе {cashes}"
             else:
                 formatted_msg = f"{shop.name},\nне закрыта смена на кассах {cashes}"
         else:
-            formatted_msg = f"Проблема с получением адреса магазина"
+            formatted_msg = "Проблема с получением адреса магазина"
         return formatted_msg

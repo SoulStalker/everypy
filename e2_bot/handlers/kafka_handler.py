@@ -1,8 +1,7 @@
 import asyncio
 
 from aiogram import Bot
-from aiogram.types import InputFile, FSInputFile
-from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter
+from aiogram.types import FSInputFile
 from loguru import logger
 
 from e2_bot.app.use_cases.handle_message import HandleIncomingAlert, HandleTotalAlert, HandlerResultsAlert, HandleWhatsAppAlert
