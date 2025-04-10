@@ -9,17 +9,19 @@
 7. Удалить пользователя
 8. Изменить пользователя
 """
-from aiogram import Router, Bot
+from aiogram import Router, Bot, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from e2_bot.app.data_access.local_db import WAGroupRepository
 from e2_bot.app.data_access.local_db import session_maker
 from e2_bot.app.use_cases import AddGroupUseCase, GetGroupUseCase
+from e2_bot.keyboards import service_kb
+from e2_bot.lexicon import LEXICON
 
 router = Router()
 
@@ -34,7 +36,7 @@ async def support_command(message: Message, bot: Bot, state: FSMContext):
     await bot.send_message(
         chat_id=message.chat.id,
         text=f"Input group id",
-        # reply_markup=create_service_kb()
+        reply_markup=service_kb()
     )
     await state.set_state(FSMGetAddGroup.fill_gr_id)
 
@@ -46,14 +48,9 @@ async def process_add_gr(message: Message, bot: Bot, state: FSMContext):
     await bot.send_message(
         chat_id=message.chat.id,
         text=f"Input group name:",
-        # reply_markup=create_service_kb()
+        reply_markup=service_kb()
     )
     await state.set_state(FSMGetAddGroup.fill_gr_name)
-    # state_data = await state.get_data()
-    # gr_task_name = state_data['gr_name']
-    # repo = WAGroupRepository(session)
-    # uc = AddGroupUseCase(repo)
-    # await uc.execute(gr_task_name, "Gophers")
 
 
 # Этот хендлер срабатывает на сообщения в FSM состоянии fill_gr_id
@@ -72,7 +69,7 @@ async def process_add_gr(message: Message, bot: Bot, session: AsyncSession, stat
         await bot.send_message(
             chat_id=message.chat.id,
             text=str(e),
-            # reply_markup=create_service_kb()
+            reply_markup=service_kb()
         )
         await state.clear()
         return
@@ -81,7 +78,18 @@ async def process_add_gr(message: Message, bot: Bot, session: AsyncSession, stat
     await bot.send_message(
         chat_id=message.chat.id,
         text=str(new_gr),
-        # reply_markup=create_service_kb()
+        reply_markup=service_kb()
+    )
+    await state.clear()
+
+
+# Этот хендлер срабатывает на кнопку "Отмена" и сбрасывает состояние FSM
+@router.callback_query(F.data == 'cancel')
+async def process_cancel_press(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    await bot.send_message(
+        chat_id=callback.message.chat.id,
+        text=LEXICON.get('choose_action', 'Выбери действие'),
+        reply_markup=service_kb()
     )
     await state.clear()
 
