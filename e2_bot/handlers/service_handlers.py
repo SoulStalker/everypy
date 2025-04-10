@@ -20,7 +20,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from e2_bot.app.data_access.local_db import WAGroupRepository
 from e2_bot.app.data_access.local_db import session_maker
 from e2_bot.app.use_cases import AddGroupUseCase, GetGroupUseCase
-from e2_bot.keyboards import service_kb
+from e2_bot.app.use_cases.wa_groups import GetAllGroupsUseCase
+from e2_bot.keyboards import service_kb, create_cancel_kb
 from e2_bot.lexicon import LEXICON
 
 router = Router()
@@ -32,11 +33,28 @@ class FSMGetAddGroup(StatesGroup):
 
 
 @router.message(Command('service'))
-async def support_command(message: Message, bot: Bot, state: FSMContext):
+async def service_command(message: Message, bot: Bot):
     await bot.send_message(
         chat_id=message.chat.id,
-        text=f"Input group id",
+        text=f"Выбери действие:\n",
         reply_markup=service_kb()
+    )
+
+
+@router.callback_query(F.data == 'get_groups')
+async def get_groups_command(callback: CallbackQuery, session: AsyncSession):
+    groups = await get_content_from_repo(session=session, t=WAGroupRepository)
+    await callback.message.edit_text(
+        text=f"{groups}",
+        reply_markup=create_cancel_kb()
+    )
+
+
+@router.callback_query(F.data == 'add_group')
+async def get_groups_command(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(
+        text=f"Введи ID группы:\n",
+        reply_markup=create_cancel_kb()
     )
     await state.set_state(FSMGetAddGroup.fill_gr_id)
 
@@ -92,6 +110,19 @@ async def process_cancel_press(callback: CallbackQuery, state: FSMContext, bot: 
         reply_markup=service_kb()
     )
     await state.clear()
+
+
+async def get_content_from_repo(session: AsyncSession, t: type, uid: str = None) -> str:
+    if t == WAGroupRepository:
+        repository = WAGroupRepository(session)
+        if uid:
+            uc = GetGroupUseCase(repository)
+            return await uc.execute(uid)
+        else:
+            uc = GetAllGroupsUseCase(repository)
+            groups = await uc.execute()
+            logger.debug(groups)
+            return groups
 
 
 async def test():

@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from e2_bot.domain.entities import WhatsAppContact, WhatsAppGroup
 from e2_bot.domain.repositories import IWAContactRepository, IWAGroupRepository
@@ -36,6 +37,11 @@ class WAGroupRepository(IWAGroupRepository):
     async def get(self, number: int) -> WhatsAppGroup:
         model = await self.session.get(self.wa_group, number)
         return gr_model_to_dto(model)
+
+    async def get_all(self):
+        result = await self.session.execute(select(self.wa_group))
+        models = result.scalars().all()
+        return [gr_model_to_dto(model).__str__() for model in models]
 
     async def add(self, gr: WhatsAppGroup):
         wa_group = gr_dto_to_model(gr)
