@@ -1,5 +1,7 @@
 from .commands import Commands
-from .shopentity import ShopEntity
-from .shift_message import USMessageEntity
+from .shops import ShopEntity
+from .shifts import USMessageEntity
+from .sales import TotalMessageEntity, ShopResultEntity
+from .whatsapp import WhatsAppMessageEntity
 
-__all__ = ["Commands", "ShopEntity", "USMessageEntity"]
+__all__ = ["Commands", "ShopEntity", "USMessageEntity", "TotalMessageEntity", "ShopResultEntity", "WhatsAppMessageEntity"]

@@ -1,5 +1,5 @@
-from e2_bot.domain.entities.shift_message import USMessageEntity
-from e2_bot.domain.entities.shopentity import ShopEntity
+from e2_bot.domain.entities.shifts import USMessageEntity
+from e2_bot.domain.entities.shops import ShopEntity
 from e2_bot.domain.repositories import IUnclosedMessageRepository, IShopRepository
 
 

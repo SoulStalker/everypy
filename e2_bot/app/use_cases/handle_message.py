@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from e2_bot.app.services.shop_service import shop_service
-from e2_bot.domain.entities.shift_message import USMessageEntity, TotalMessageEntity, ShopResultEntity, WhatsAppMessageEntity
+from e2_bot.domain.entities import USMessageEntity, TotalMessageEntity, ShopResultEntity, WhatsAppMessageEntity
 from e2_bot.domain.value_objects.content_types import ContentTypes
 
 
