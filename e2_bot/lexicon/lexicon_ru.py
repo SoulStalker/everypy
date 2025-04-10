@@ -3,7 +3,7 @@ from e2_bot.domain.value_objects import UserCommand
 LEXICON_COMMANDS: dict[str, str] = {
     UserCommand.START.value: 'Запуск бота',
     UserCommand.HELP.value: 'Справка по работе бота',
-    # UserCommand.SERVICE.value: 'Настройка',
+    UserCommand.SERVICE.value: 'Настройка',
     # UserCommand.CONTACTS.value: 'Контакты',
     UserCommand.UNCLOSED.value: 'Незакрытые смены',
     UserCommand.TOTAL.value: 'Итоги за день',

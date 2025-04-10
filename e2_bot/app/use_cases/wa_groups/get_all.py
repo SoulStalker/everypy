@@ -1,4 +1,4 @@
-class GetAllGroupsUseCase:
+class GetAllUseCase:
     def __init__(self, repository):
         self.repository = repository
 

@@ -12,3 +12,4 @@ wheels/
 .idea
 credentials.json
 shops.json
+*.db

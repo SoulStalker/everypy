@@ -12,21 +12,22 @@ class WAContactRepository(IWAContactRepository):
         self.session = session
         self.wa_contact = Contact
 
-    async def get(self, number: int) -> WhatsAppContact | None:
-        result = await self.session.get(self.wa_contact, number)
-        if result:
-            return ct_model_to_dto(result)
+    async def get(self, phone: int) -> WhatsAppContact | None:
+        model = await self.session.get(self.wa_contact, phone)
+        if model:
+            return ct_model_to_dto(model)
         return None
 
     async def get_all(self):
-        # Реализация аналогично get, но с выборкой всех записей
-        pass
+        result = await self.session.execute(select(self.wa_contact))
+        models = result.scalars().all()
+        return [ct_model_to_dto(model).__str__() for model in models]
 
-    async def add(self, contact: WhatsAppContact):
-        model = ct_dto_to_model(contact)
-        self.session.add(model)
+    async def add(self, gr: WhatsAppContact):
+        wa_contact = ct_dto_to_model(gr)
+        self.session.add(wa_contact)
         await self.session.commit()
-        await self.session.refresh(model)
+        await self.session.refresh(wa_contact)
 
 
 class WAGroupRepository(IWAGroupRepository):
@@ -34,9 +35,11 @@ class WAGroupRepository(IWAGroupRepository):
         self.session = session
         self.wa_group = Group
 
-    async def get(self, number: int) -> WhatsAppGroup:
+    async def get(self, number: int) -> WhatsAppGroup | None:
         model = await self.session.get(self.wa_group, number)
-        return gr_model_to_dto(model)
+        if model:
+            return gr_model_to_dto(model)
+        return None
 
     async def get_all(self):
         result = await self.session.execute(select(self.wa_group))

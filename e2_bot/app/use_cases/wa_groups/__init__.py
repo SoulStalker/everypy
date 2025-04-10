@@ -1,5 +1,6 @@
 from .add_group import AddGroupUseCase
-from .get_group import GetGroupUseCase
-from .get_all_groups import GetAllGroupsUseCase
+from .get_model import GetModelUseCase
+from .get_all import GetAllUseCase
+from .add_contact import AddContactUseCase
 
-__all__ = ['AddGroupUseCase', 'GetGroupUseCase', 'GetAllGroupsUseCase']
+__all__ = ['AddGroupUseCase', 'GetModelUseCase', 'GetAllUseCase', 'AddContactUseCase']

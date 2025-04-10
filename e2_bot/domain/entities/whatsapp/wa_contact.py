@@ -64,3 +64,11 @@ class WhatsAppContact:
     @telegram_id.setter
     def telegram_id(self, value):
         self._telegram_id = value
+
+    def __str__(self):
+        return (f"WhatsAppContact("
+                f"phone_number={self.phone_number}\n"
+                f"first_name={self.first_name}\n"
+                f"last_name={self.last_name}\n"
+                f"email={self.email}\n"
+                f"telegram_id={self.telegram_id})\n")
