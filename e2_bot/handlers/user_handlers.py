@@ -82,7 +82,7 @@ async def otrs_stats_command(message: Message, bot: Bot):
 
 # Этот хендлер срабатывает на команду /equipment
 @router.message(Command('equipment'))
-async def otrs_stats_command(message: Message, bot: Bot):
+async def equipment_command(message: Message, bot: Bot):
     payload = {"chat_id": message.chat.id, "command": UserCommand.EQUIPMENT.name}
     logger.success(f"Sending message to topic {KafkaTopics.EQUIPMENT.name}")
     producer.send(KafkaTopics.EQUIPMENT.value, payload)

@@ -12,7 +12,7 @@ from e2_bot.handlers.kafka_handler import build_kafka_handler
 from e2_bot.infrastructure.consumer import KafkaMessageReceiver
 from e2_bot.keyboards import set_main_menu
 from e2_bot.middlewares import ShadowBanMiddleware, DbMiddleware
-from e2_bot.app.data_access.local_db import session_maker # create_tables, drop_tables
+from e2_bot.app.data_access.local_db import session_maker ,create_tables, drop_tables
 
 
 async def main():
@@ -22,7 +22,7 @@ async def main():
     await set_main_menu(bot)
     # # Создаем базу
     # await drop_tables()
-    # await create_tables()
+    await create_tables()
 
     dp.include_router(router)
 

@@ -25,3 +25,4 @@ class Contact(Base):
 
     def __repr__(self):
         return f"<Contact(phone={self.phone_number}, name={self.first_name} {self.last_name})>"
+

@@ -1,4 +1,4 @@
-from e2_bot.domain.entities import USMessageEntity, ShopEntity, WhatsAppGroup, WhatsAppContact
+from e2_bot.domain.entities import USMessageEntity, WhatsAppGroup, WhatsAppContact
 from e2_bot.domain.repositories import IUnclosedMessageRepository, IShopRepository, IWAContactRepository, IWAGroupRepository
 
 
