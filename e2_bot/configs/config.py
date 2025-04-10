@@ -5,6 +5,7 @@ from environs import Env
 @dataclass
 class DatabaseConfig:
     database: str
+    local_db: str
 
 
 @dataclass
@@ -38,6 +39,7 @@ def load_config(path: str | None = None) -> Config:
         ),
         db=DatabaseConfig(
             database=env('DB_URL'),
+            local_db=env('LOCAL_DB'),
         ),
         kafka=KafkaConfig(
             broker=env('KAFKA_BROKER'),

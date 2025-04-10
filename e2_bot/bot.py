@@ -11,7 +11,8 @@ from e2_bot.handlers import router
 from e2_bot.handlers.kafka_handler import build_kafka_handler
 from e2_bot.infrastructure.consumer import KafkaMessageReceiver
 from e2_bot.keyboards import set_main_menu
-from e2_bot.middlewares import ShadowBanMiddleware
+from e2_bot.middlewares import ShadowBanMiddleware, DbMiddleware
+from e2_bot.app.data_access.local_db import session_maker, create_tables, drop_tables
 
 
 async def main():
@@ -19,10 +20,14 @@ async def main():
     bot = Bot(token=config.tg_bot.token)
     dp = Dispatcher()
     await set_main_menu(bot)
+    # # Создаем базу
+    # await drop_tables()
+    await create_tables()
 
     dp.include_router(router)
 
     dp.update.middleware(ShadowBanMiddleware(config.tg_bot.admin_ids))
+    dp.update.middleware(DbMiddleware(session_pool=session_maker))
 
     # Инициализируем Kafka receiver
     kafka_receiver = KafkaMessageReceiver(
@@ -38,10 +43,10 @@ async def main():
     # Запускаем консюмера в фоне
     asyncio.create_task(kafka_receiver.consume(kafka_handler))
 
-    # 🕒 Настраиваем планировщик задач
+    # Настраиваем планировщик задач
     scheduler = AsyncIOScheduler()
 
-    # Пример: 3 уведомления в день в определённое время
+    # Отправляем уведомления в день в определённое время
     scheduler.add_job(
         send_otrs_notifications,
         CronTrigger(hour=13, minute=00),

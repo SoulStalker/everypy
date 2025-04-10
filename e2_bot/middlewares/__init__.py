@@ -1,3 +1,3 @@
-from .outer import ShadowBanMiddleware
+from .outer import ShadowBanMiddleware, DbMiddleware
 
-__all__ = ['ShadowBanMiddleware']
+__all__ = ['ShadowBanMiddleware', 'DbMiddleware']

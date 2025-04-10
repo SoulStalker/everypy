@@ -92,24 +92,3 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                 )
 
     return handler
-
-
-# async def send_photo_async(bot, chat_id, image_path, caption):
-#     try:
-#         # Проверяем, что файл существует
-#         with open(image_path, "rb") as photo:
-#             photo = InputFile(image_path),
-#             await bot.send_photo(
-#                 chat_id=chat_id,
-#                 photo=photo,
-#                 caption=caption,
-#                 # show_caption_above_media=True,
-#             )
-#     except FileNotFoundError:
-#         logger.error(f"Файл {image_path} не найден!")
-#     except TelegramBadRequest as e:
-#         logger.error(f"Ошибка Telegram API: {e.message}")
-#     except TelegramRetryAfter as e:
-#         logger.warning(f"Превышен лимит запросов. Повторите через {e.retry_after} сек.")
-#     except Exception as e:
-#         logger.error(f"Неожиданная ошибка: {e}")
