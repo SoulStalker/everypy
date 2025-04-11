@@ -13,4 +13,7 @@ class AddContactUseCase:
             email=email,
             telegram_id=telegram_id
         )
-        return await self.repository.add(entity)
+        wac, err = await self.repository.add(entity)
+        if err:
+            return err
+        return wac

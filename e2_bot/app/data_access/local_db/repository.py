@@ -23,12 +23,14 @@ class WAContactRepository(IWAContactRepository):
         models = result.scalars().all()
         return [ct_model_to_dto(model).__str__() for model in models]
 
-    async def add(self, gr: WhatsAppContact):
-        wa_contact = ct_dto_to_model(gr)
+    async def add(self, ct: WhatsAppContact):
+        if await self.get(ct.phone_number):
+            return ct, "Contact already exists"
+        wa_contact = ct_dto_to_model(ct)
         self.session.add(wa_contact)
         await self.session.commit()
         await self.session.refresh(wa_contact)
-        return ct_model_to_dto(wa_contact)
+        return ct_model_to_dto(wa_contact), None
 
 
 class WAGroupRepository(IWAGroupRepository):
@@ -48,8 +50,10 @@ class WAGroupRepository(IWAGroupRepository):
         return [gr_model_to_dto(model).__str__() for model in models]
 
     async def add(self, gr: WhatsAppGroup):
+        if await self.get(gr.group_id):
+            return gr, "Group already exists"
         wa_group = gr_dto_to_model(gr)
         self.session.add(wa_group)
         await self.session.commit()
         await self.session.refresh(wa_group)
-        return gr_model_to_dto(wa_group)
+        return gr_model_to_dto(wa_group), None

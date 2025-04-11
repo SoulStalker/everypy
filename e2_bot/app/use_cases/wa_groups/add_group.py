@@ -10,4 +10,8 @@ class AddGroupUseCase:
             group_id=group_id,
             group_name=group_name,
         )
-        return await self.repository.add(entity)
+        wag, err = await self.repository.add(entity)
+        if err:
+            return err
+        return wag
+
