@@ -22,6 +22,7 @@ from e2_bot.app.data_access.local_db import WAGroupRepository
 from e2_bot.app.data_access.local_db import session_maker
 from e2_bot.app.use_cases import AddGroupUseCase, GetModelUseCase, AddContactUseCase
 from e2_bot.app.use_cases.wa_groups import GetAllUseCase
+from e2_bot.filtes import IsGroupAdmin
 from e2_bot.keyboards import service_kb, create_cancel_kb
 from e2_bot.lexicon import LEXICON
 
@@ -62,7 +63,7 @@ async def get_contacts_command(callback: CallbackQuery, session: AsyncSession):
     )
 
 
-@router.callback_query(F.data == 'add_group')
+@router.callback_query(F.data == 'add_group', IsGroupAdmin())
 async def add_group_command(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
         text=f"Введи ID группы:\n",
@@ -72,7 +73,7 @@ async def add_group_command(callback: CallbackQuery, state: FSMContext):
 
 
 # Этот хендлер срабатывает на сообщения в FSM состоянии fill_gr_id
-@router.message(StateFilter(FSMGetAddGroup.fill_gr_id))
+@router.message(StateFilter(FSMGetAddGroup.fill_gr_id), IsGroupAdmin())
 async def process_add_gr(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(gr_id=message.text)
     await bot.send_message(
@@ -84,7 +85,7 @@ async def process_add_gr(message: Message, bot: Bot, state: FSMContext):
 
 
 # Этот хендлер срабатывает на сообщения в FSM состоянии fill_gr_id
-@router.message(StateFilter(FSMGetAddGroup.fill_gr_name))
+@router.message(StateFilter(FSMGetAddGroup.fill_gr_name), IsGroupAdmin())
 async def process_fill_gr(message: Message, bot: Bot, session: AsyncSession, state: FSMContext):
     await state.update_data(gr_name=message.text)
     state_data = await state.get_data()
@@ -113,7 +114,7 @@ async def process_fill_gr(message: Message, bot: Bot, session: AsyncSession, sta
     await state.clear()
 
 
-@router.callback_query(F.data == 'add_contact')
+@router.callback_query(F.data == 'add_contact', IsGroupAdmin())
 async def add_contact_command(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
         text=f"Введи номер телефона в формате 79999999999:\n",
@@ -123,7 +124,7 @@ async def add_contact_command(callback: CallbackQuery, state: FSMContext):
 
 
 # Этот хендлер срабатывает на сообщения в FSM состоянии fill_gr_id
-@router.message(StateFilter(FSMGetAddGroup.fill_phone))
+@router.message(StateFilter(FSMGetAddGroup.fill_phone), IsGroupAdmin())
 async def process_add_gr(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(phone=message.text)
     await bot.send_message(
@@ -135,7 +136,7 @@ async def process_add_gr(message: Message, bot: Bot, state: FSMContext):
 
 
 # Этот хендлер срабатывает на сообщения в FSM состоянии fill_gr_id
-@router.message(StateFilter(FSMGetAddGroup.fill_name))
+@router.message(StateFilter(FSMGetAddGroup.fill_name), IsGroupAdmin())
 async def process_fill_gr(message: Message, bot: Bot, session: AsyncSession, state: FSMContext):
     await state.update_data(first_name=message.text)
     state_data = await state.get_data()
