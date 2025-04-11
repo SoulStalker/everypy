@@ -66,8 +66,8 @@ class WhatsAppContact:
         self._telegram_id = value
 
     def __str__(self):
-        return (f"Телефон: {self.phone_number}\n"
-                f"Имя: {self.first_name}\n"
-                f"Фамилия: {self.last_name}\n"
-                f"Email: {self.email}\n"
-                f"Телеграмм: {self.telegram_id}\n")
+        return (f"{self.phone_number}\n"
+                f"{self.first_name}\n"
+                f"{self.last_name}\n"
+                f"{self.email}\n"
+                f"{self.telegram_id}\n")

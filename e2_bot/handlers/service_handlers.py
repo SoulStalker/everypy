@@ -75,7 +75,7 @@ async def get_contacts_command(callback: CallbackQuery, session: AsyncSession):
 @router.callback_query(F.data == 'add_group', IsGroupAdmin())
 async def add_group_command(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
-        text=f"Введи ID группы:\n",
+        text=LEXICON.get("input_group_id"),
         reply_markup=create_cancel_kb()
     )
     await state.set_state(FSMGetAddGroup.fill_gr_id)
@@ -87,7 +87,7 @@ async def process_add_gr(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(gr_id=message.text)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=f"Введи название группы:",
+        text=LEXICON.get("input_group_name"),
         reply_markup=create_cancel_kb()
     )
     await state.set_state(FSMGetAddGroup.fill_gr_name)
@@ -112,7 +112,7 @@ async def process_fill_gr(message: Message, bot: Bot, session: AsyncSession, sta
 @router.callback_query(F.data == 'add_contact', IsGroupAdmin())
 async def add_contact_command(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
-        text=f"Введи номер телефона в формате 79999999999:\n",
+        text=LEXICON.get("input_phone"),
         reply_markup=create_cancel_kb()
     )
     await state.set_state(FSMGetAddGroup.fill_phone)
@@ -124,7 +124,7 @@ async def process_add_ct(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(phone=message.text)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=f"Введи имя контакта:",
+        text=LEXICON.get("input_contact_name"),
         reply_markup=create_cancel_kb()
     )
     await state.set_state(FSMGetAddGroup.fill_name)
@@ -136,8 +136,8 @@ async def process_fill_name(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(first_name=message.text)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=f"Введи фамилия контакта:",
-        reply_markup=service_kb()
+        text=LEXICON.get('input_contact_last_name'),
+        reply_markup=create_cancel_kb()
     )
     await state.set_state(FSMGetAddGroup.fill_last_name)
 
@@ -148,8 +148,8 @@ async def process_fill_ln(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(last_name=message.text)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=f"Введи email контакта:",
-        reply_markup=service_kb()
+        text=LEXICON.get('input_contact_email'),
+        reply_markup=create_cancel_kb()
     )
     await state.set_state(FSMGetAddGroup.fill_email)
 
@@ -160,13 +160,13 @@ async def process_fill_email(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(email=message.text)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=f"Введи телегу контакта:",
-        reply_markup=service_kb()
+        text=LEXICON.get('input_contact_tg'),
+        reply_markup=create_cancel_kb()
     )
     await state.set_state(FSMGetAddGroup.fill_tg)
 
 
-# Этот хендлер срабатывает на сообщения в FSM состоянии fill_email
+# Этот хендлер срабатывает на сообщения в FSM состоянии fill_tg
 @router.message(StateFilter(FSMGetAddGroup.fill_tg), IsGroupAdmin())
 async def process_fill_tg(message: Message, bot: Bot, session: AsyncSession, state: FSMContext):
     await state.update_data(telegram_id=message.text)

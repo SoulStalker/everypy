@@ -45,16 +45,16 @@ class HandlerResultsAlert:
                 state=results["state"],
             )
             return message.format()
+        else:
+            shop = shop_service.get(shop_id)
+            results = raw_data["results"]
 
-        shop = shop_service.get(shop_id)
-        results = raw_data["results"]
-
-        sum_by_checks = results["sum_by_checks"]
-        checks_count = results["checks_count"]
-        state = results["state"]
-        message = ShopResultEntity(
-            sum_by_checks, checks_count, state
-        )
+            sum_by_checks = results["sum_by_checks"]
+            checks_count = results["checks_count"]
+            state = results["state"]
+            message = ShopResultEntity(
+                sum_by_checks, checks_count, state
+            )
         return message.format(shop)
 
 

@@ -30,7 +30,7 @@ class ShopResultEntity:
 
     def format(self, shop: ShopEntity):
         formatted_msg = (
-            f"Суммарный отчет за {datetime.date.today()}:\n"
+            f"Отчет за {datetime.date.today()}:\n{shop.name}\n"
             f"Чеки: {self.checks_count} шт\n"
             f"Оборот: {self.sum_by_checks:.2f} руб."
         )

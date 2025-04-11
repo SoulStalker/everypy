@@ -3,6 +3,7 @@ from sqlalchemy.future import select
 
 from e2_bot.domain.entities import WhatsAppContact, WhatsAppGroup
 from e2_bot.domain.repositories import IWAContactRepository, IWAGroupRepository
+from e2_bot.lexicon import LEXICON
 from .mappers import gr_model_to_dto, ct_model_to_dto, ct_dto_to_model, gr_dto_to_model
 from .models import Group, Contact
 
@@ -25,7 +26,7 @@ class WAContactRepository(IWAContactRepository):
 
     async def add(self, ct: WhatsAppContact):
         if await self.get(ct.phone_number):
-            return ct, "Contact already exists"
+            return ct, LEXICON.get('contact_exists')
         wa_contact = ct_dto_to_model(ct)
         self.session.add(wa_contact)
         await self.session.commit()
@@ -51,7 +52,7 @@ class WAGroupRepository(IWAGroupRepository):
 
     async def add(self, gr: WhatsAppGroup):
         if await self.get(gr.group_id):
-            return gr, "Group already exists"
+            return gr, LEXICON['group_exists']
         wa_group = gr_dto_to_model(gr)
         self.session.add(wa_group)
         await self.session.commit()

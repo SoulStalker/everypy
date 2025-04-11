@@ -8,12 +8,12 @@ class MessageFormatter:
     @classmethod
     async def execute(cls, entity: WhatsAppMessageEntity):
         time_stamp = entity.time_stamp.strftime("%d.%m.%Y, %H:%M:%S")
-        formatted_msg = f"Сообщение в группе {entity.group}\n[{time_stamp}] {entity.sender}: {entity.content}"
+        formatted_msg = f"🔔 <b>{entity.group}</b>\n<i>{time_stamp}</i>\n<b>{entity.sender}:</b> {entity.content}"
         async with session_maker() as session:
             repo = WAContactRepository(session)
             uc = GetModelUseCase(repo)
             contact = await uc.execute(entity.sender)
-            sender_name = f"{contact.first_name} {contact.last_name}"
             if contact:
-                formatted_msg = f"Сообщение в группе {entity.group}\n[{time_stamp}] {sender_name}: {entity.content}"
+                sender_name = f"{contact.first_name} {contact.last_name}"
+                formatted_msg = f"🔔 <b>{entity.group}</b>\n<i>{time_stamp}</i>\n<b>{sender_name}:</b> {entity.content}"
         return formatted_msg
