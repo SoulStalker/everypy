@@ -48,19 +48,25 @@ async def service_command(message: Message, bot: Bot):
 @router.callback_query(F.data == 'get_groups')
 async def get_groups_command(callback: CallbackQuery, session: AsyncSession):
     groups = await get_content_from_repo(session=session, t=WAGroupRepository)
-    await callback.message.edit_text(
-        text=f"{groups}",
-        reply_markup=service_kb()
-    )
+    try:
+        await callback.message.edit_text(
+            text=f"{groups}",
+            reply_markup=service_kb()
+        )
+    except Exception as e:
+        logger.error(e)
 
 
 @router.callback_query(F.data == 'get_contacts')
 async def get_contacts_command(callback: CallbackQuery, session: AsyncSession):
     contacts = await get_content_from_repo(session=session, t=WAContactRepository)
-    await callback.message.edit_text(
-        text=f"{contacts}",
-        reply_markup=service_kb()
-    )
+    try:
+        await callback.message.edit_text(
+            text=f"{contacts}",
+            reply_markup=service_kb()
+        )
+    except Exception as e:
+        logger.error(e)
 
 
 @router.callback_query(F.data == 'add_group', IsGroupAdmin())
