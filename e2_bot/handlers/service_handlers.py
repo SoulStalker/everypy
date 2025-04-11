@@ -96,21 +96,7 @@ async def process_fill_gr(message: Message, bot: Bot, session: AsyncSession, sta
     await state.update_data(gr_name=message.text)
     state_data = await state.get_data()
     gr_id, gr_name = state_data['gr_id'], state_data['gr_name']
-    repo = WAGroupRepository(session)
-    uc = AddGroupUseCase(repo)
-    ug = GetModelUseCase(repo)
-    logger.debug(gr_id, gr_name)
-    try:
-        await uc.execute(gr_id, gr_name)
-    except Exception as e:
-        await bot.send_message(
-            chat_id=message.chat.id,
-            text=str(e),
-            reply_markup=service_kb()
-        )
-        await state.clear()
-        return
-    new_gr = await ug.execute(gr_id)
+    new_gr = await add_data_to_repo(session=session, t=WAGroupRepository, group_id=gr_id, group_name=gr_name)
     logger.debug(str(new_gr))
     await bot.send_message(
         chat_id=message.chat.id,
@@ -141,28 +127,17 @@ async def process_add_gr(message: Message, bot: Bot, state: FSMContext):
     await state.set_state(FSMGetAddGroup.fill_name)
 
 
-# Этот хендлер срабатывает на сообщения в FSM состоянии fill_gr_id
+# Этот хендлер срабатывает на сообщения в FSM состоянии fill_name
 @router.message(StateFilter(FSMGetAddGroup.fill_name), IsGroupAdmin())
 async def process_fill_gr(message: Message, bot: Bot, session: AsyncSession, state: FSMContext):
     await state.update_data(first_name=message.text)
     state_data = await state.get_data()
     phone, first_name = state_data['phone'], state_data['first_name']
-    repo = WAContactRepository(session)
-    uc = AddContactUseCase(repo)
-    ug = GetModelUseCase(repo)
-    logger.debug(phone, first_name)
-    try:
-        await uc.execute(phone, first_name)
-    except Exception as e:
-        await bot.send_message(
-            chat_id=message.chat.id,
-            text=str(e),
-            reply_markup=service_kb()
-        )
-        await state.clear()
-        return
-    new_ct = await ug.execute(phone)
-    logger.debug(str(new_ct))
+    new_ct = await add_data_to_repo(
+        session=session,
+        t=WAContactRepository,
+        phone=phone,
+        first_name=first_name)
     await bot.send_message(
         chat_id=message.chat.id,
         text=str(new_ct),
@@ -192,6 +167,22 @@ async def get_content_from_repo(session: AsyncSession, t: type, pk: str = None) 
         result = await uc.execute()
         logger.debug(result)
         return result
+
+
+async def add_data_to_repo(session: AsyncSession, t: type, **kwargs) -> str:
+    uc = None
+    repository = t(session)
+    logger.debug(repository)
+    if type(repository) is WAGroupRepository:
+        uc = AddGroupUseCase(repository)
+    elif type(repository) is WAContactRepository:
+        uc = AddContactUseCase(repository)
+    logger.debug(uc)
+    if uc:
+        try:
+            return await uc.execute(**kwargs)
+        except Exception as e:
+            return str(e)
 
 
 async def test():

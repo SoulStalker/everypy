@@ -28,6 +28,7 @@ class WAContactRepository(IWAContactRepository):
         self.session.add(wa_contact)
         await self.session.commit()
         await self.session.refresh(wa_contact)
+        return ct_model_to_dto(wa_contact)
 
 
 class WAGroupRepository(IWAGroupRepository):
@@ -51,3 +52,4 @@ class WAGroupRepository(IWAGroupRepository):
         self.session.add(wa_group)
         await self.session.commit()
         await self.session.refresh(wa_group)
+        return gr_model_to_dto(wa_group)
