@@ -2,7 +2,7 @@ import re
 
 
 class WhatsAppContact:
-    def __init__(self, phone_number, first_name, last_name=None, email=None, telegram_id=None):
+    def __init__(self, phone_number, first_name, last_name="", email="", telegram_id=""):
         self._phone_number = None
         self._first_name = None
         self._last_name = None
@@ -66,9 +66,8 @@ class WhatsAppContact:
         self._telegram_id = value
 
     def __str__(self):
-        return (f"WhatsAppContact("
-                f"phone_number={self.phone_number}\n"
-                f"first_name={self.first_name}\n"
-                f"last_name={self.last_name}\n"
-                f"email={self.email}\n"
-                f"telegram_id={self.telegram_id})\n")
+        return (f"Телефон: {self.phone_number}\n"
+                f"Имя: {self.first_name}\n"
+                f"Фамилия: {self.last_name}\n"
+                f"Email: {self.email}\n"
+                f"Телеграмм: {self.telegram_id}\n")

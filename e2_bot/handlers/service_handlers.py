@@ -1,11 +1,11 @@
 """
 Задача для этого модуля:
-1. Получить список групп
-2. Получить список пользователей
-3. Добавить группу
+1. Получить список групп +
+2. Получить список пользователей +
+3. Добавить группу +
 4. Изменить группу
 5. Удалить группу
-6. Добавить пользователя
+6. Добавить пользователя +
 7. Удалить пользователя
 8. Изменить пользователя
 """
@@ -34,6 +34,9 @@ class FSMGetAddGroup(StatesGroup):
     fill_gr_name = State()
     fill_phone = State()
     fill_name = State()
+    fill_last_name = State()
+    fill_email = State()
+    fill_tg = State()
 
 
 @router.message(Command('service'))
@@ -50,7 +53,7 @@ async def get_groups_command(callback: CallbackQuery, session: AsyncSession):
     groups = await get_content_from_repo(session=session, t=WAGroupRepository)
     try:
         await callback.message.edit_text(
-            text=f"{groups}",
+            text="\n".join(groups),
             reply_markup=service_kb()
         )
     except Exception as e:
@@ -62,7 +65,7 @@ async def get_contacts_command(callback: CallbackQuery, session: AsyncSession):
     contacts = await get_content_from_repo(session=session, t=WAContactRepository)
     try:
         await callback.message.edit_text(
-            text=f"{contacts}",
+            text="\n".join(contacts),
             reply_markup=service_kb()
         )
     except Exception as e:
@@ -117,7 +120,7 @@ async def add_contact_command(callback: CallbackQuery, state: FSMContext):
 
 # Этот хендлер срабатывает на сообщения в FSM состоянии fill_gr_id
 @router.message(StateFilter(FSMGetAddGroup.fill_phone), IsGroupAdmin())
-async def process_add_gr(message: Message, bot: Bot, state: FSMContext):
+async def process_add_ct(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(phone=message.text)
     await bot.send_message(
         chat_id=message.chat.id,
@@ -129,15 +132,60 @@ async def process_add_gr(message: Message, bot: Bot, state: FSMContext):
 
 # Этот хендлер срабатывает на сообщения в FSM состоянии fill_name
 @router.message(StateFilter(FSMGetAddGroup.fill_name), IsGroupAdmin())
-async def process_fill_gr(message: Message, bot: Bot, session: AsyncSession, state: FSMContext):
+async def process_fill_name(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(first_name=message.text)
+    await bot.send_message(
+        chat_id=message.chat.id,
+        text=f"Введи фамилия контакта:",
+        reply_markup=service_kb()
+    )
+    await state.set_state(FSMGetAddGroup.fill_last_name)
+
+
+# Этот хендлер срабатывает на сообщения в FSM состоянии fill_last_name
+@router.message(StateFilter(FSMGetAddGroup.fill_last_name), IsGroupAdmin())
+async def process_fill_ln(message: Message, bot: Bot, state: FSMContext):
+    await state.update_data(last_name=message.text)
+    await bot.send_message(
+        chat_id=message.chat.id,
+        text=f"Введи email контакта:",
+        reply_markup=service_kb()
+    )
+    await state.set_state(FSMGetAddGroup.fill_email)
+
+
+# Этот хендлер срабатывает на сообщения в FSM состоянии fill_email
+@router.message(StateFilter(FSMGetAddGroup.fill_email), IsGroupAdmin())
+async def process_fill_email(message: Message, bot: Bot, state: FSMContext):
+    await state.update_data(email=message.text)
+    await bot.send_message(
+        chat_id=message.chat.id,
+        text=f"Введи телегу контакта:",
+        reply_markup=service_kb()
+    )
+    await state.set_state(FSMGetAddGroup.fill_tg)
+
+
+# Этот хендлер срабатывает на сообщения в FSM состоянии fill_email
+@router.message(StateFilter(FSMGetAddGroup.fill_tg), IsGroupAdmin())
+async def process_fill_tg(message: Message, bot: Bot, session: AsyncSession, state: FSMContext):
+    await state.update_data(telegram_id=message.text)
     state_data = await state.get_data()
-    phone, first_name = state_data['phone'], state_data['first_name']
+    phone = state_data['phone']
+    first_name = state_data['first_name']
+    last_name = state_data['last_name']
+    email = state_data['email']
+    telegram_id = state_data['telegram_id']
     new_ct = await add_data_to_repo(
         session=session,
         t=WAContactRepository,
         phone=phone,
-        first_name=first_name)
+        first_name=first_name,
+        last_name=last_name,
+        email=email,
+        telegram_id=telegram_id
+    )
+    logger.debug(str(new_ct))
     await bot.send_message(
         chat_id=message.chat.id,
         text=str(new_ct),

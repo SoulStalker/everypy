@@ -1,11 +1,13 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from e2_bot.app.constants import KafkaTopics
-from e2_bot.app.data_access.local_db import session_maker, create_tables
+from e2_bot.app.data_access.local_db import session_maker
 from e2_bot.app.services.notifcation_sender import send_otrs_notifications, send_unclosed_notifications
 from e2_bot.configs import load_config
 from e2_bot.handlers import service_router, user_router
@@ -20,7 +22,7 @@ from e2_bot.middlewares import ShadowBanMiddleware, DbMiddleware
 
 async def main():
     config = load_config('.env')
-    bot = Bot(token=config.tg_bot.token)
+    bot = Bot(token=config.tg_bot.token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher()
     await set_main_menu(bot)
     # # Создаем базу

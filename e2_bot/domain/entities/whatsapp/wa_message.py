@@ -2,6 +2,7 @@ import base64
 import datetime
 from dataclasses import dataclass
 from pathlib import Path
+
 from loguru import logger
 
 
@@ -20,7 +21,7 @@ class WhatsAppMessageEntity:
         self.group = group
         self.content_type = content_type
         self.time_stamp = time_stamp
-        self.media_dir = Path("media")  # Путь к папке
+        self.media_dir = Path("media")
 
     def save_media(self) -> tuple[str, str | None]:
         caption = f"Сообщение в группе {self.group}\n[{self.time_stamp.strftime('%d.%m.%Y, %H:%M:%S')}] {self.sender}:"
@@ -52,6 +53,5 @@ class WhatsAppMessageEntity:
     def format(self):
         sender = self.sender.split("@")[0]
         time_stamp = self.time_stamp.strftime("%d.%m.%Y, %H:%M:%S")
-        # time_stamp = self.time_stamp.split("T")[0]
         formatted_msg = f"Сообщение в группе {self.group}\n[{time_stamp}] {sender}: {self.content}"
         return formatted_msg
