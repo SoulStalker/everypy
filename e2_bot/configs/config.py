@@ -13,6 +13,7 @@ class TgBot:
     token: str
     admin_ids: list[int]
     chat_id: int
+    owner_id: int
 
 
 @dataclass
@@ -36,6 +37,7 @@ def load_config(path: str | None = None) -> Config:
             token=env('BOT_TOKEN'),
             admin_ids=list(map(int, env.list('ADMIN_IDS'))),
             chat_id=env.int('CHAT_ID'),
+            owner_id=env.int('OWNER_ID'),
         ),
         db=DatabaseConfig(
             database=env('DB_URL'),
