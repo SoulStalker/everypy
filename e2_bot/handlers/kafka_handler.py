@@ -16,7 +16,7 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
         chat_id = message.get("chat_id", config.tg_bot.chat_id)
         cmd = message.get("command", "WS")
         content = message.get("content")
-        logger.debug(f"Received message: {chat_id} {cmd} ")
+        logger.debug(f"Received message: {chat_id} {cmd}")
         match cmd:
             case UserCommand.UNCLOSED.name:
                 shifts_from_kafka = dict(message.get("content", "Пустое сообщение"))
