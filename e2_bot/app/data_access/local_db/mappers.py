@@ -1,6 +1,7 @@
-from e2_bot.domain.entities import WhatsAppContact, WhatsAppGroup
+from e2_bot.domain.entities import WhatsAppContact, WhatsAppGroup, FunData
 
-from .models import Group, Contact
+from .models import Group, Contact, Funny
+from .repository import FunDataRepository
 
 
 def ct_model_to_dto(model: Contact) -> WhatsAppContact:
@@ -34,4 +35,20 @@ def gr_dto_to_model(dto: WhatsAppGroup) -> Group:
     return Group(
         group_id=dto.group_id,
         group_name=dto.group_name,
+    )
+
+
+def funny_dto_to_model(dto: FunData) -> Funny:
+    return Funny(
+        content_type=dto.content_type,
+        file_id=dto.file_id,
+        answer=dto.answer
+    )
+
+
+def funny_model_to_dto(model: Funny) -> FunData:
+    return FunData(
+        content_type=model.content_type,
+        file_id=model.file_id,
+        answer=model.answer
     )

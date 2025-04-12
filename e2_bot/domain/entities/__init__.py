@@ -3,6 +3,7 @@ from .shops import ShopEntity
 from .shifts import USMessageEntity
 from .sales import TotalMessageEntity, ShopResultEntity
 from .whatsapp import WhatsAppMessageEntity, WhatsAppGroup, WhatsAppContact
+from .fun_data import FunData
 
 __all__ = [
     "Commands",
@@ -13,4 +14,5 @@ __all__ = [
     "WhatsAppMessageEntity",
     "WhatsAppGroup",
     "WhatsAppContact",
+    "FunData",
 ]

@@ -1,4 +1,4 @@
-from e2_bot.domain.entities import USMessageEntity, ShopEntity, WhatsAppGroup, WhatsAppContact
+from e2_bot.domain.entities import USMessageEntity, ShopEntity, WhatsAppGroup, WhatsAppContact, FunData
 
 
 class IUnclosedMessageRepository:
@@ -54,4 +54,14 @@ class IWAGroupRepository:
 
     @staticmethod
     def delete(group: WhatsAppGroup):
+        raise NotImplementedError
+
+
+class IFunDataRepository:
+    @staticmethod
+    def get() -> FunData:
+        raise NotImplementedError
+
+    @staticmethod
+    def add(data: FunData):
         raise NotImplementedError

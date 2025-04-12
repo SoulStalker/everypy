@@ -7,7 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from e2_bot.app.constants import KafkaTopics
-from e2_bot.app.data_access.local_db import session_maker
+from e2_bot.app.data_access.local_db import session_maker, create_tables
 from e2_bot.app.services import cleanup_media_files
 from e2_bot.app.services.notifcation_sender import send_otrs_notifications, send_unclosed_notifications
 from e2_bot.configs import load_config

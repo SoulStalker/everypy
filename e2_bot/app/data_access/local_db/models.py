@@ -26,3 +26,14 @@ class Contact(Base):
     def __repr__(self):
         return f"<Contact(phone={self.phone_number}, name={self.first_name} {self.last_name})>"
 
+
+class Funny(Base):
+    __tablename__ = 'funny'
+
+    id = Column(String, primary_key=True)
+    content_type = Column(Text, nullable=False)
+    file_id = Column(String, nullable=False)
+    answer = Column(Text, nullable=False)
+
+    def __repr__(self):
+        return f"<Funny(content_type={self.content_type}, answer={self.answer}, file_id={self.file_id})>"

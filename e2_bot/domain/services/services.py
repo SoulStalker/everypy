@@ -1,5 +1,5 @@
-from e2_bot.domain.entities import USMessageEntity, WhatsAppGroup, WhatsAppContact
-from e2_bot.domain.repositories import IUnclosedMessageRepository, IShopRepository, IWAContactRepository, IWAGroupRepository
+from e2_bot.domain.entities import USMessageEntity, WhatsAppGroup, WhatsAppContact, FunData
+from e2_bot.domain.repositories import IUnclosedMessageRepository, IShopRepository, IWAContactRepository, IWAGroupRepository, IFunDataRepository
 
 
 class UnclosedMessageService:
@@ -56,3 +56,14 @@ class WAContactService:
 
     def delete(self, contact: WhatsAppContact):
         return self.repository.delete(contact)
+
+
+class FunDataService:
+    def __init__(self, repository: IFunDataRepository):
+        self.repository = repository
+
+    def get(self):
+        return self.repository.get()
+
+    def add(self, data: FunData):
+        return self.repository.add(data)

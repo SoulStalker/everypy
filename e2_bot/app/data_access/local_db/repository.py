@@ -1,11 +1,12 @@
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from e2_bot.domain.entities import WhatsAppContact, WhatsAppGroup
-from e2_bot.domain.repositories import IWAContactRepository, IWAGroupRepository
+from e2_bot.domain.entities import WhatsAppContact, WhatsAppGroup, FunData
+from e2_bot.domain.repositories import IWAContactRepository, IWAGroupRepository, IFunDataRepository
 from e2_bot.lexicon import LEXICON
-from .mappers import gr_model_to_dto, ct_model_to_dto, ct_dto_to_model, gr_dto_to_model
-from .models import Group, Contact
+from .mappers import gr_model_to_dto, ct_model_to_dto, ct_dto_to_model, gr_dto_to_model, funny_model_to_dto
+from .models import Group, Contact, Funny
 
 
 class WAContactRepository(IWAContactRepository):
@@ -58,3 +59,30 @@ class WAGroupRepository(IWAGroupRepository):
         await self.session.commit()
         await self.session.refresh(wa_group)
         return gr_model_to_dto(wa_group), None
+
+
+class FunDataRepository(IFunDataRepository):
+    def __init__(self, session: AsyncSession):
+        self.session = session
+        self.funny = Funny
+
+    async def get_random(self, content_type: str, answer: str = None):
+        result = await self.session.execute(select(self.funny)
+                                            .filter_by(content_type=content_type, answer=answer)
+                                            .order_by(func.random()))
+
+        model = result.scalars().one_or_none()
+        if model:
+            return funny_model_to_dto(model)
+        return None
+
+    async def add(self, data: FunData):
+        funny = Funny(
+            content_type=data.content_type,
+            file_id=data.file_id,
+            answer=data.answer,
+        )
+        self.session.add(funny)
+        await self.session.commit()
+        await self.session.refresh(funny)
+        return funny_model_to_dto(funny)
