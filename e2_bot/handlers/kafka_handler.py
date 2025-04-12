@@ -9,6 +9,7 @@ from e2_bot.app.use_cases.funny.send_fun import send_funny
 from e2_bot.app.use_cases.handle_message import HandleIncomingAlert, HandleTotalAlert, HandlerResultsAlert, HandleWhatsAppAlert
 from e2_bot.configs import load_config
 from e2_bot.domain.value_objects.user_command import UserCommand
+from e2_bot.lexicon import LEXICON
 
 config = load_config()
 
@@ -18,22 +19,25 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
         chat_id = message.get("chat_id", config.tg_bot.chat_id)
         cmd = message.get("command", "WS")
         content = message.get("content")
-        logger.debug(f"Received message: {chat_id} {cmd}")
+        logger.debug(f"Received message: {chat_id} {cmd}, {content}")
         match cmd:
             case UserCommand.UNCLOSED.name:
                 shifts_from_kafka = dict(message.get("content", "Пустое сообщение"))
-                hia, status = HandleIncomingAlert()
+                if not shifts_from_kafka:
+                    asyncio.run_coroutine_threadsafe(
+                        bot.send_message(chat_id=chat_id, text=LEXICON['all_closed']),
+                        loop
+                    )
+                    asyncio.run_coroutine_threadsafe(
+                        send_funny(bot, answer=TgAnswer.ALL_CLOSED.value),
+                        loop)
+                hia = HandleIncomingAlert()
                 if chat_id:
                     for data in shifts_from_kafka.items():
                         payload = {"store_id": data[0], "cashes": data[1]}
                         formatted_shift = hia.execute(payload)
                         asyncio.run_coroutine_threadsafe(
                             bot.send_message(chat_id=chat_id, text=formatted_shift),
-                            loop
-                        )
-                    if status:
-                        asyncio.run_coroutine_threadsafe(
-                            send_funny(bot, answer=TgAnswer.ALL_CLOSED.value),
                             loop
                         )
             case UserCommand.TOTAL.name:

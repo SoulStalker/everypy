@@ -14,7 +14,6 @@ class HandleIncomingAlert:
         shop_id = raw_data["store_id"]
         cashes = raw_data["cashes"]
         shop = shop_service.get(shop_id)
-
         message = USMessageEntity(
             shop_number=shop_id,
             cashes=cashes,
