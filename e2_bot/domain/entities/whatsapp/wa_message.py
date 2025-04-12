@@ -50,6 +50,12 @@ class WhatsAppMessageEntity:
             logger.error(f"Media save failed: {str(e)}", exc_info=True)
         return caption, None
 
+    def clean_media_path(self):
+        if self.media_dir.exists():
+            for file in self.media_dir.iterdir():
+                logger.info(file)
+                file.unlink()
+
     def format(self):
         sender = self.sender.split("@")[0]
         time_stamp = self.time_stamp.strftime("%d.%m.%Y, %H:%M:%S")

@@ -77,10 +77,8 @@ class HandleWhatsAppAlert:
                 return "text", asyncio.run(fmt.execute(message))
             case ContentTypes.IMAGE.value:
                 caption, filepath = message.save_media()
-                logger.info(filepath)
                 caption = asyncio.run(fmt.execute(message))
-                logger.debug(caption)
-                logger.error(filepath)
+                # message.clean_media_path()
                 return caption, filepath
             case ContentTypes.VIDEO.value:
                 return "video", "video"
@@ -88,3 +86,16 @@ class HandleWhatsAppAlert:
                 return "audio", "video"
             case _:
                 return "other", "video"
+
+
+class CleanSavedMedia:
+    @classmethod
+    def execute(cls):
+        abc = WhatsAppMessageEntity(
+            sender="",
+            content="",
+            group="",
+            content_type="",
+            time_stamp=datetime.now())
+        abc.clean_media_path()
+

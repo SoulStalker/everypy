@@ -8,6 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from e2_bot.app.constants import KafkaTopics
 from e2_bot.app.data_access.local_db import session_maker
+from e2_bot.app.services import cleanup_media_files
 from e2_bot.app.services.notifcation_sender import send_otrs_notifications, send_unclosed_notifications
 from e2_bot.configs import load_config
 from e2_bot.handlers import service_router, user_router
@@ -72,6 +73,10 @@ async def main():
     scheduler.add_job(
         send_otrs_notifications,
         CronTrigger(hour=23, minute=30),
+    )
+    scheduler.add_job(
+        cleanup_media_files,
+        CronTrigger(hour=23, minute=59),
     )
     scheduler.start()
 

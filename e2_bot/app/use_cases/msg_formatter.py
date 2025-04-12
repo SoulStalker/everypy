@@ -6,10 +6,11 @@ from e2_bot.domain.value_objects.content_types import ContentTypes
 
 from loguru import logger
 
+
 class MessageFormatter:
     @classmethod
     async def execute(cls, entity: WhatsAppMessageEntity):
-
+        sender_name = entity.sender
         time_stamp = entity.time_stamp.strftime("%d.%m.%Y, %H:%M:%S")
         formatted_msg = f"🔔 <b>{entity.group}</b>\n<i>{time_stamp}</i>\n<b>{entity.sender}:</b>"
         async with session_maker() as session:
@@ -28,4 +29,3 @@ class MessageFormatter:
         if entity.content_type == ContentTypes.TEXT.value:
             formatted_msg += f"{entity.content}"
         return formatted_msg
-
