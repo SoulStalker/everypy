@@ -4,6 +4,8 @@ from aiogram import Bot
 from aiogram.types import FSInputFile
 from loguru import logger
 
+from e2_bot.app.constants import TgAnswer
+from e2_bot.app.use_cases.funny.send_fun import send_funny
 from e2_bot.app.use_cases.handle_message import HandleIncomingAlert, HandleTotalAlert, HandlerResultsAlert, HandleWhatsAppAlert
 from e2_bot.configs import load_config
 from e2_bot.domain.value_objects.user_command import UserCommand
@@ -20,13 +22,18 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
         match cmd:
             case UserCommand.UNCLOSED.name:
                 shifts_from_kafka = dict(message.get("content", "Пустое сообщение"))
-                hia = HandleIncomingAlert()
+                hia, status = HandleIncomingAlert()
                 if chat_id:
                     for data in shifts_from_kafka.items():
                         payload = {"store_id": data[0], "cashes": data[1]}
                         formatted_shift = hia.execute(payload)
                         asyncio.run_coroutine_threadsafe(
                             bot.send_message(chat_id=chat_id, text=formatted_shift),
+                            loop
+                        )
+                    if status:
+                        asyncio.run_coroutine_threadsafe(
+                            send_funny(bot, answer=TgAnswer.ALL_CLOSED.value),
                             loop
                         )
             case UserCommand.TOTAL.name:

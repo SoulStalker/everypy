@@ -52,7 +52,7 @@ async def get_groups_command(callback: CallbackQuery, session: AsyncSession):
 
 @router.callback_query(F.data == 'get_contacts')
 async def get_contacts_command(callback: CallbackQuery, session: AsyncSession, bot: Bot):
-    await send_funny(bot, session)
+    await send_funny(bot)
     contacts = await get_content_from_repo(session=session, t=WAContactRepository)
     try:
         await callback.message.edit_text(

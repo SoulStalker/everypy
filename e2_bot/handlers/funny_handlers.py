@@ -10,6 +10,7 @@ from loguru import logger
 from e2_bot.app.data_access.local_db.repository import FunDataRepository
 from e2_bot.app.use_cases.funny import AddFunDataUseCase, GetRandomFunnyUseCase
 from e2_bot.configs import load_config
+from e2_bot.filtes import IsGroupAdmin
 from e2_bot.keyboards import funny_kb
 
 config = load_config('.env')
@@ -22,8 +23,10 @@ class FSMSaveFunny(StatesGroup):
 
 
 # Хендлер для сохранения гифок
-@router.message(F.animation | F.sticker)
+@router.message((F.animation | F.sticker), F.chat.type == 'private')
 async def handle_animation(message: Message, state: FSMContext, bot: Bot):
+    if message.from_user.id != config.tg_bot.owner_id:
+        return
     file_id, content_type = "", ""
     if message.content_type == 'sticker':
         file_id = message.sticker.file_id
@@ -36,12 +39,16 @@ async def handle_animation(message: Message, state: FSMContext, bot: Bot):
     await state.set_state(FSMSaveFunny.select_type)
 
 
-@router.callback_query(StateFilter(FSMSaveFunny.select_type))
+@router.callback_query(StateFilter(FSMSaveFunny.select_type), IsGroupAdmin())
 async def process_select_type(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
     state_data = await state.get_data()
     logger.debug(state_data)
     logger.debug(callback.data)
     uc = AddFunDataUseCase(FunDataRepository(session))
-    await uc.execute(file_id=state_data['file_id'], content_type=state_data['content_type'], answer=callback.data)
+    _, err = await uc.execute(file_id=state_data['file_id'], content_type=state_data['content_type'], answer=callback.data)
+    if err:
+        await callback.message.reply(err)
+        await state.clear()
+        return
     await callback.message.reply(f"Файл сохранён")
     await state.clear()

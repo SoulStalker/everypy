@@ -4,6 +4,7 @@ import random
 
 from loguru import logger
 from otrs_service.app.db import DataAnalyzer, session_maker
+from otrs_service.app.constants import TgAnswer
 
 
 async def get_message(analyzer, period):
@@ -44,12 +45,15 @@ async def get_message(analyzer, period):
             poos.setdefault(result[0], result[2])
     if len(poos) > 0:
         hero = min(poos.items(), key=lambda x: x[1])
-        end_word = bad_work(hero[0])
+        # end_word = bad_work(hero[0])
+        end_word = TgAnswer.BAD_BOY.value
     else:
-        end_word = 'Надо же как отработали, ни одной какахи'
+        # end_word = 'Надо же как отработали, ни одной какахи'
+        end_word = TgAnswer.GOOD_BOY.value
     if len(strongs) > 0:
-        super_hero = max(strongs, key=lambda x: x[1])
-        end_word = well_done(super_hero)
+        # super_hero = max(strongs, key=lambda x: x[1])
+        # end_word = well_done(super_hero)
+        end_word = TgAnswer.GOOD_BOY.value
     return message, end_word
 
 

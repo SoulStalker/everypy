@@ -3,7 +3,8 @@ from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 from loguru import logger
 
-from e2_bot.app.constants import KafkaTopics
+from e2_bot.app.constants import KafkaTopics, TgAnswer
+from e2_bot.app.use_cases.funny.send_fun import send_funny
 from e2_bot.configs import load_config
 from e2_bot.domain.value_objects import UserCommand
 from e2_bot.infrastructure.producer import KafkaMessageSender
@@ -45,6 +46,7 @@ async def contacts_command(message: Message, bot: Bot):
 # Этот хендлер срабатывает на команду /unclosed
 @router.message(Command('unclosed'))
 async def unclosed_command(message: Message, bot: Bot):
+    await send_funny(bot, answer=TgAnswer.YES_SIR.value)
     payload = {"chat_id": message.chat.id, "command": UserCommand.UNCLOSED.name}
     producer.send(KafkaTopics.USER_COMMANDS.value, payload)
 
@@ -66,6 +68,7 @@ async def results_by_shop_command(message: Message, bot: Bot):
 # Этот хендлер срабатывает на команду /otrs_stats
 @router.message(Command('otrs_stats'))
 async def otrs_stats_command(message: Message, bot: Bot):
+    await send_funny(bot, answer=TgAnswer.YES_SIR.value)
     payload = {"chat_id": message.chat.id, "command": UserCommand.OTRS_STATS.name}
     logger.success(f"Sending message to topic {KafkaTopics.OTRS_STATS.name}")
     producer.send(KafkaTopics.OTRS_STATS.value, payload)
@@ -74,6 +77,7 @@ async def otrs_stats_command(message: Message, bot: Bot):
 # Этот хендлер срабатывает на команду /equipment
 @router.message(Command('equipment'))
 async def equipment_command(message: Message, bot: Bot):
+    await send_funny(bot, answer=TgAnswer.YES_SIR.value)
     payload = {"chat_id": message.chat.id, "command": UserCommand.EQUIPMENT.name}
     logger.success(f"Sending message to topic {KafkaTopics.EQUIPMENT.name}")
     producer.send(KafkaTopics.EQUIPMENT.value, payload)

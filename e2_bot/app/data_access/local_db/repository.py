@@ -68,6 +68,12 @@ class FunDataRepository(IFunDataRepository):
         self.session = session
         self.funny = Funny
 
+    async def get(self, file_id: str):
+        model = await self.session.get(self.funny, file_id)
+        if model:
+            return funny_model_to_dto(model)
+        return None
+
     async def get_random(self, answer: str, content_type: str = None):
         stmt = select(self.funny).where(self.funny.answer == answer)
 
@@ -86,6 +92,8 @@ class FunDataRepository(IFunDataRepository):
         return None
 
     async def add(self, data: FunData):
+        if await self.get(data.file_id):
+            return None, LEXICON['funny_exists']
         funny = Funny(
             content_type=data.content_type,
             file_id=data.file_id,
@@ -94,4 +102,4 @@ class FunDataRepository(IFunDataRepository):
         self.session.add(funny)
         await self.session.commit()
         await self.session.refresh(funny)
-        return funny_model_to_dto(funny)
+        return funny_model_to_dto(funny), None
