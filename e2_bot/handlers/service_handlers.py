@@ -194,15 +194,7 @@ async def process_fill_tg(message: Message, bot: Bot, session: AsyncSession, sta
     await state.clear()
 
 
-# Этот хендлер срабатывает на кнопку "Отмена" и сбрасывает состояние FSM
-@router.callback_query(F.data == 'cancel')
-async def process_cancel(callback: CallbackQuery, state: FSMContext, bot: Bot):
-    await bot.send_message(
-        chat_id=callback.message.chat.id,
-        text=LEXICON.get('choose_action', 'Выбери действие'),
-        reply_markup=service_kb()
-    )
-    await state.clear()
+
 
 
 async def get_content_from_repo(session: AsyncSession, t: type, pk: str = None) -> str:
@@ -231,6 +223,15 @@ async def add_data_to_repo(session: AsyncSession, t: type, **kwargs) -> str:
             return await uc.execute(**kwargs)
         except Exception as e:
             return str(e)
+
+# Этот хендлер срабатывает на кнопку "Отмена" и сбрасывает состояние FSM
+@router.callback_query(F.data == 'cancel')
+async def process_cancel(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    await bot.send_message(
+        chat_id=callback.message.chat.id,
+        text=LEXICON.get('choose_menu', 'Выбери команду в меню. Либо отправь мне стикер или гифку'),
+    )
+    await state.clear()
 
 
 async def test():

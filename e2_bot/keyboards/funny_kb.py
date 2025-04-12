@@ -8,11 +8,11 @@ def funny_kb(width: int = 2) -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
     kb_builder.row(
         InlineKeyboardButton(
-            text=LEXICON.get("good_boy", "Гифка"),
+            text=LEXICON.get("good_boy", "👍"),
             callback_data='good_boy'
         ),
         InlineKeyboardButton(
-            text=LEXICON.get("bad_boy", "Стикер"),
+            text=LEXICON.get("bad_boy", "👎"),
             callback_data='bad_boy'
         ),
     ),
