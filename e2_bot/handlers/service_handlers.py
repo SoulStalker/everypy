@@ -1,14 +1,3 @@
-"""
-Задача для этого модуля:
-1. Получить список групп +
-2. Получить список пользователей +
-3. Добавить группу +
-4. Изменить группу
-5. Удалить группу
-6. Добавить пользователя +
-7. Удалить пользователя
-8. Изменить пользователя
-"""
 from aiogram import Router, Bot, F
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
@@ -21,6 +10,7 @@ from e2_bot.app.data_access import WAContactRepository
 from e2_bot.app.data_access.local_db import WAGroupRepository
 from e2_bot.app.data_access.local_db import session_maker
 from e2_bot.app.use_cases import AddGroupUseCase, GetModelUseCase, AddContactUseCase
+from e2_bot.app.use_cases.funny.send_fun import send_funny
 from e2_bot.app.use_cases.wa_groups import GetAllUseCase
 from e2_bot.filtes import IsGroupAdmin
 from e2_bot.keyboards import service_kb, create_cancel_kb
@@ -61,7 +51,8 @@ async def get_groups_command(callback: CallbackQuery, session: AsyncSession):
 
 
 @router.callback_query(F.data == 'get_contacts')
-async def get_contacts_command(callback: CallbackQuery, session: AsyncSession):
+async def get_contacts_command(callback: CallbackQuery, session: AsyncSession, bot: Bot):
+    await send_funny(bot, session)
     contacts = await get_content_from_repo(session=session, t=WAContactRepository)
     try:
         await callback.message.edit_text(
@@ -194,9 +185,6 @@ async def process_fill_tg(message: Message, bot: Bot, session: AsyncSession, sta
     await state.clear()
 
 
-
-
-
 async def get_content_from_repo(session: AsyncSession, t: type, pk: str = None) -> str:
     repository = t(session)
     if pk:
@@ -223,6 +211,7 @@ async def add_data_to_repo(session: AsyncSession, t: type, **kwargs) -> str:
             return await uc.execute(**kwargs)
         except Exception as e:
             return str(e)
+
 
 # Этот хендлер срабатывает на кнопку "Отмена" и сбрасывает состояние FSM
 @router.callback_query(F.data == 'cancel')

@@ -1,7 +1,6 @@
 from e2_bot.domain.entities import WhatsAppContact, WhatsAppGroup, FunData
 
 from .models import Group, Contact, Funny
-from .repository import FunDataRepository
 
 
 def ct_model_to_dto(model: Contact) -> WhatsAppContact:

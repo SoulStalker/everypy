@@ -3,9 +3,12 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from loguru import logger
 
+from e2_bot.app.data_access.local_db.repository import FunDataRepository
+from e2_bot.app.use_cases.funny import AddFunDataUseCase, GetRandomFunnyUseCase
 from e2_bot.configs import load_config
 from e2_bot.keyboards import funny_kb
 
@@ -34,14 +37,11 @@ async def handle_animation(message: Message, state: FSMContext, bot: Bot):
 
 
 @router.callback_query(StateFilter(FSMSaveFunny.select_type))
-async def process_select_type(callback: CallbackQuery, state: FSMContext):
+async def process_select_type(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
     state_data = await state.get_data()
     logger.debug(state_data)
     logger.debug(callback.data)
+    uc = AddFunDataUseCase(FunDataRepository(session))
+    await uc.execute(file_id=state_data['file_id'], content_type=state_data['content_type'], answer=callback.data)
     await callback.message.reply(f"Файл сохранён")
     await state.clear()
-
-
-
-    # await bot.send_animation(chat_id=message.chat.id, animation="CgACAgQAAxkBAAILV2f6CeqiIm1nRVQshtrOuszoUWYnAAK2AgACyQsNUyezzCs-co_pNgQ")
-    # await bot.send_sticker(chat_id=message.chat.id, sticker="CAACAgIAAxkBAAILSGf6CGhnceMKBC0lIw97BfPQnx4kAAL4JAACrpHASF45skRx5PUtNgQ")

@@ -30,9 +30,8 @@ class Contact(Base):
 class Funny(Base):
     __tablename__ = 'funny'
 
-    id = Column(String, primary_key=True)
     content_type = Column(Text, nullable=False)
-    file_id = Column(String, nullable=False)
+    file_id = Column(String, primary_key=True)
     answer = Column(Text, nullable=False)
 
     def __repr__(self):

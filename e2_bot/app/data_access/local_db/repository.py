@@ -8,6 +8,8 @@ from e2_bot.lexicon import LEXICON
 from .mappers import gr_model_to_dto, ct_model_to_dto, ct_dto_to_model, gr_dto_to_model, funny_model_to_dto
 from .models import Group, Contact, Funny
 
+from loguru import logger
+
 
 class WAContactRepository(IWAContactRepository):
     def __init__(self, session: AsyncSession):
@@ -66,12 +68,19 @@ class FunDataRepository(IFunDataRepository):
         self.session = session
         self.funny = Funny
 
-    async def get_random(self, content_type: str, answer: str = None):
-        result = await self.session.execute(select(self.funny)
-                                            .filter_by(content_type=content_type, answer=answer)
-                                            .order_by(func.random()))
+    async def get_random(self, answer: str, content_type: str = None):
+        stmt = select(self.funny).where(self.funny.answer == answer)
 
-        model = result.scalars().one_or_none()
+        if content_type is not None:
+            stmt = stmt.where(self.funny.content_type == content_type)
+
+        stmt = stmt.order_by(func.random()).limit(1)
+
+        result = await self.session.execute(stmt)
+        model = result.scalars().first()
+
+        logger.info(f"Random model: {model}")
+
         if model:
             return funny_model_to_dto(model)
         return None
