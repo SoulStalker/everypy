@@ -1,7 +1,6 @@
 import asyncio
 from datetime import datetime
 
-from loguru import logger
 
 from e2_bot.app.services.shop_service import shop_service
 from e2_bot.app.use_cases.msg_formatter import MessageFormatter

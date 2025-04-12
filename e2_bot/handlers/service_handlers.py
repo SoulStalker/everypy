@@ -43,7 +43,7 @@ class FSMGetAddGroup(StatesGroup):
 async def service_command(message: Message, bot: Bot):
     await bot.send_message(
         chat_id=message.chat.id,
-        text=f"Выбери действие:\n",
+        text="Выбери действие:\n",
         reply_markup=service_kb()
     )
 

@@ -11,7 +11,7 @@ from e2_bot.app.data_access.local_db import session_maker
 from e2_bot.app.services import cleanup_media_files
 from e2_bot.app.services.notifcation_sender import send_otrs_notifications, send_unclosed_notifications
 from e2_bot.configs import load_config
-from e2_bot.handlers import service_router, user_router
+from e2_bot.handlers import service_router, user_router, funny_router
 from e2_bot.handlers.kafka_handler import build_kafka_handler
 from e2_bot.infrastructure.consumer import KafkaMessageReceiver
 from e2_bot.keyboards import set_main_menu
@@ -32,6 +32,7 @@ async def main():
 
     dp.include_router(service_router)
     dp.include_router(user_router)
+    dp.include_router(funny_router)
 
     dp.update.middleware(ShadowBanMiddleware(config.tg_bot.admin_ids))
     dp.update.middleware(DbMiddleware(session_pool=session_maker))

@@ -4,7 +4,6 @@ from e2_bot.app.use_cases import GetModelUseCase
 from e2_bot.domain.entities import WhatsAppMessageEntity
 from e2_bot.domain.value_objects.content_types import ContentTypes
 
-from loguru import logger
 
 
 class MessageFormatter:
