@@ -12,3 +12,19 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - KAFKA_BROKER=${KAFKA_BROKER}
       - CHAT_ID=${CHAT_ID}
+  gs:
+    build:
+      context: .
+      dockerfile: Dockerfile_gs
+    env_file:
+      - .env
+    environment:
+      - DB_URL=${DB_URL}
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - KAFKA_BROKER=${KAFKA_BROKER}
+      - CHAT_ID=${CHAT_ID}
+      - CREDENTIALS_FILE=${CREDENTIALS_FILE}
+      - SHEET_NAME=${SHEET_NAME}
+      - LIST_NAME=${LIST_NAME}

@@ -2,11 +2,11 @@ import asyncio
 
 from loguru import logger
 
-from app.constants.topics import KafkaTopics
+from gsheet_service.app.constants.topics import KafkaTopics
 from gsheet_service.configs import load_config
 from gsheet_service.infrastructure import start_consumer
 from gsheet_service.service import get_data
-from infrastructure.producer import send_message
+from gsheet_service.infrastructure.producer import send_message
 
 config = load_config()
 

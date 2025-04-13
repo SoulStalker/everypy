@@ -6,6 +6,6 @@ COPY pyproject.toml uv.lock /app/
 
 RUN uv sync --frozen
 
-COPY . /app
+COPY /csi_service /app/csi_service
 
 CMD ["uv", "run", "-m", "csi_service"]

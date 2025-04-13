@@ -1,0 +1,12 @@
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+
+WORKDIR /app
+
+COPY pyproject.toml uv.lock /app/
+
+RUN uv sync --frozen
+
+COPY /gsheet_service /app/gsheet_service
+COPY credentials.json /app/credentials.json
+
+CMD ["uv", "run", "-m", "gsheet_service"]
