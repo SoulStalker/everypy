@@ -12,6 +12,7 @@ from e2_bot.app.use_cases.funny import AddFunDataUseCase, GetRandomFunnyUseCase
 from e2_bot.configs import load_config
 from e2_bot.filtes import IsGroupAdmin
 from e2_bot.keyboards import funny_kb
+from e2_bot.lexicon import LEXICON
 
 config = load_config('.env')
 
@@ -34,7 +35,7 @@ async def handle_animation(message: Message, state: FSMContext, bot: Bot):
     elif message.content_type == 'animation':
         file_id = message.animation.file_id
         content_type = 'animation'
-    await message.reply("Выберите тип сохранения", reply_markup=funny_kb())
+    await message.reply(LEXICON.get('select_type'), reply_markup=funny_kb())
     await state.update_data(file_id=file_id, content_type=content_type)
     await state.set_state(FSMSaveFunny.select_type)
 
@@ -50,5 +51,5 @@ async def process_select_type(callback: CallbackQuery, state: FSMContext, sessio
         await callback.message.reply(err)
         await state.clear()
         return
-    await callback.message.reply(f"Файл сохранён")
+    await callback.message.reply(LEXICON.get('funny_saved'))
     await state.clear()

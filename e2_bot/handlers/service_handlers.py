@@ -10,7 +10,6 @@ from e2_bot.app.data_access import WAContactRepository
 from e2_bot.app.data_access.local_db import WAGroupRepository
 from e2_bot.app.data_access.local_db import session_maker
 from e2_bot.app.use_cases import AddGroupUseCase, GetModelUseCase, AddContactUseCase
-from e2_bot.app.use_cases.funny.send_fun import send_funny
 from e2_bot.app.use_cases.wa_groups import GetAllUseCase
 from e2_bot.filtes import IsGroupAdmin
 from e2_bot.keyboards import service_kb, create_cancel_kb
@@ -52,7 +51,6 @@ async def get_groups_command(callback: CallbackQuery, session: AsyncSession):
 
 @router.callback_query(F.data == 'get_contacts')
 async def get_contacts_command(callback: CallbackQuery, session: AsyncSession, bot: Bot):
-    await send_funny(bot)
     contacts = await get_content_from_repo(session=session, t=WAContactRepository)
     try:
         await callback.message.edit_text(
@@ -218,7 +216,7 @@ async def add_data_to_repo(session: AsyncSession, t: type, **kwargs) -> str:
 async def process_cancel(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await bot.send_message(
         chat_id=callback.message.chat.id,
-        text=LEXICON.get('choose_menu', 'Выбери команду в меню. Либо отправь мне стикер или гифку'),
+        text=LEXICON.get('select_menu'),
     )
     await state.clear()
 

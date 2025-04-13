@@ -76,7 +76,6 @@ class HandleWhatsAppAlert:
             case ContentTypes.IMAGE.value:
                 caption, filepath = message.save_media()
                 caption = asyncio.run(fmt.execute(message))
-                # message.clean_media_path()
                 return caption, filepath
             case ContentTypes.VIDEO.value:
                 return "video", "video"

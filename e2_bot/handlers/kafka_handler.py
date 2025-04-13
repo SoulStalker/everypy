@@ -97,7 +97,7 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                         logger.error(f"Ошибка: {e}")
             case _:
                 asyncio.run_coroutine_threadsafe(
-                    bot.send_message(chat_id=chat_id, text="unknown message"),
+                    bot.send_message(chat_id=chat_id, text=LEXICON.get("unknown message")),
                     loop
                 )
 
