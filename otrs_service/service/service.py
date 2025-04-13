@@ -1,10 +1,16 @@
+import asyncio
 import datetime
 import calendar
 import random
 
 from loguru import logger
+from sqlalchemy import select
+
 from otrs_service.app.db import DataAnalyzer, session_maker
 from otrs_service.app.constants import TgAnswer
+from otrs_service.app.db.models import Ticket
+from otrs_service.app.last_id import load_last_id, save_last_id
+
 
 
 async def get_message(analyzer, period):
@@ -143,3 +149,20 @@ async def get_stats():
         return message, finish
 
     return message, finish
+
+
+async def check_new_tickets():
+    last_id = load_last_id()
+    async with session_maker() as session:
+        result = await session.execute(
+            select(Ticket).where(Ticket.id > last_id).order_by(Ticket.id)
+        )
+        new_tickets = result.scalars().all()
+        if new_tickets:
+            for ticket in new_tickets:
+                await process_ticket(ticket)
+            save_last_id(new_tickets[-1].id)
+
+
+async def process_ticket(ticket):
+    logger.info(f"Обработка тикета с ID: {ticket.id}")

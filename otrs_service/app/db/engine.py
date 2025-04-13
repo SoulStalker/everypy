@@ -12,3 +12,5 @@ engine = create_async_engine(
     pool_timeout=30,  # Ожидание свободного соединения
 )
 session_maker = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+
+session = session_maker()

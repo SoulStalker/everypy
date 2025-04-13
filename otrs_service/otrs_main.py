@@ -6,7 +6,7 @@ from otrs_service.app.constants import KafkaTopics
 from otrs_service.configs import load_config
 from otrs_service.infrastructure.consumer import start_consumer
 from otrs_service.infrastructure.producer import send_message
-from otrs_service.service.service import get_stats
+from otrs_service.service.service import get_stats, check_new_tickets
 
 config = load_config('.env')
 
@@ -22,6 +22,8 @@ async def process_message(msg):
 
 
 async def main():
+    await check_new_tickets()
+
     logger.info("Запуск слушателя Kafka...")
     for msg in start_consumer(config.kafka.broker, "csi_service"):
         logger.debug(f"Получено сообщение: {msg}")
