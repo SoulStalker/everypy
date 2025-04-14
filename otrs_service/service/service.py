@@ -1,16 +1,14 @@
-import asyncio
-import datetime
 import calendar
+import datetime
 import random
 
 from loguru import logger
 from sqlalchemy import select
 
-from otrs_service.app.db import DataAnalyzer, session_maker
 from otrs_service.app.constants import TgAnswer
+from otrs_service.app.db import DataAnalyzer, session_maker
 from otrs_service.app.db.models import Ticket
 from otrs_service.app.last_id import load_last_id, save_last_id
-
 
 
 async def get_message(analyzer, period):
@@ -138,14 +136,14 @@ async def get_stats():
 
     # если сегодня воскресенье
     if datetime.datetime.today().weekday() == 6:
-        message, finish = get_message(analyzer, 'месяц')
+        message, finish = await get_message(analyzer, 'месяц')
         return message, finish
 
     # если сегодня последний день месяца
     today = datetime.date.today()
     is_last_day_of_month = today.day == calendar.monthrange(today.year, today.month)[1]
     if is_last_day_of_month:
-        message, finish = get_message(analyzer, 'месяц')
+        message, finish = await get_message(analyzer, 'месяц')
         return message, finish
 
     return message, finish

@@ -59,10 +59,21 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                         )
             case UserCommand.OTRS_STATS.name:
                 chat_id = config.tg_bot.chat_id
-                asyncio.run_coroutine_threadsafe(
-                    bot.send_message(chat_id=chat_id, text=content),
-                    loop
-                )
+                if content == TgAnswer.GOOD_BOY.value:
+                    asyncio.run_coroutine_threadsafe(
+                        send_funny(bot, answer=TgAnswer.GOOD_BOY.value),
+                        loop
+                    )
+                elif content == TgAnswer.BAD_BOY.value:
+                    asyncio.run_coroutine_threadsafe(
+                        send_funny(bot, answer=TgAnswer.BAD_BOY.value),
+                        loop
+                    )
+                else:
+                    asyncio.run_coroutine_threadsafe(
+                        bot.send_message(chat_id=chat_id, text=content),
+                        loop
+                    )
             case UserCommand.EQUIPMENT.name:
                 chat_id = config.tg_bot.chat_id
                 asyncio.run_coroutine_threadsafe(

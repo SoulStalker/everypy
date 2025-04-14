@@ -23,18 +23,18 @@ services:
       - CREDENTIALS_FILE=${CREDENTIALS_FILE}
       - SHEET_NAME=${SHEET_NAME}
       - LIST_NAME=${LIST_NAME}
-#  otrs:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile_otrs
-#    env_file:
-#      - .env
-#    environment:
-#      - OTRS_DB_URL=${OTRS_DB_URL}
-#      - OTRS_DB_HOST=${OTRS_DB_HOST}
-#      - OTRS_DB_USER=${OTRS_DB_USER}
-#      - OTRS_DB_PASSWORD=${OTRS_DB_PASSWORD}
-#      - KAFKA_BROKER=${KAFKA_BROKER}
+  otrs:
+    build:
+      context: .
+      dockerfile: Dockerfile_otrs
+    env_file:
+      - .env
+    environment:
+      - OTRS_DB_URL=${OTRS_DB_URL}
+      - OTRS_DB_HOST=${OTRS_DB_HOST}
+      - OTRS_DB_USER=${OTRS_DB_USER}
+      - OTRS_DB_PASSWORD=${OTRS_DB_PASSWORD}
+      - KAFKA_BROKER=${KAFKA_BROKER}
   bot:
     build:
       context: .
@@ -50,3 +50,6 @@ services:
       - LOCAL_DB=${LOCAL_DB}
     volumes:
       - ./sqlite_data/bot.sqlite:/app/e2_bot/bot.sqlite
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      -
