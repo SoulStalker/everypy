@@ -96,6 +96,23 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                         bot.send_message(chat_id=chat_id, text=image_path),
                         loop
                     )
+                elif message.get("content_type", "") == "video/mp4":
+                    video = FSInputFile(image_path)
+                    future = asyncio.run_coroutine_threadsafe(
+                        bot.send_video(
+                            chat_id=chat_id,
+                            video=video,
+                            caption=caption,
+                            show_caption_above_media=True,
+                        ),
+                        loop
+                    )
+                    try:
+                        future.result(timeout=15)  # Явно получаем результат
+                    except asyncio.TimeoutError:
+                        logger.error("Таймаут при отправке фото.")
+                    except Exception as e:
+                        logger.error(f"Ошибка: {e}")
                 else:
                     photo = FSInputFile(image_path)
                     future = asyncio.run_coroutine_threadsafe(

@@ -151,10 +151,13 @@ async def get_stats():
 
 
 async def check_new_tickets():
+    queue_ids = [1, 4]
     last_id = load_last_id()
     async with session_maker() as session:
         result = await session.execute(
-            select(Ticket).where(Ticket.id > last_id).order_by(Ticket.id)
+            select(Ticket).where(
+                Ticket.id > last_id,
+                Ticket.queue_id.in_([1, 4])).order_by(Ticket.id)
         )
         new_tickets = result.scalars().all()
         if new_tickets:

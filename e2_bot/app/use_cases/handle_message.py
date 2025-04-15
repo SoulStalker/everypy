@@ -62,7 +62,6 @@ class HandlerResultsAlert:
 class HandleWhatsAppAlert:
     @classmethod
     def execute(cls, raw_data: dict):
-        logger.info(raw_data)
         message = WhatsAppMessageEntity(
             sender=raw_data.get("sender", ""),
             content=raw_data.get("content", ""),
@@ -83,7 +82,11 @@ class HandleWhatsAppAlert:
                 caption += message.caption
                 return caption, filepath
             case ContentTypes.VIDEO.value:
-                return "video", "video"
+                logger.error(ContentTypes.VIDEO.value)
+                caption, filepath = message.save_media()
+                caption = asyncio.run(fmt.execute(message))
+                caption += message.caption
+                return caption, filepath
             case ContentTypes.AUDIO.value:
                 return "audio", "video"
             case _:
