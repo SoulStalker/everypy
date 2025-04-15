@@ -12,12 +12,14 @@ class WhatsAppMessageEntity:
             self,
             sender: str,
             content: str,
+            caption: str,
             group: str,
             content_type: str,
             time_stamp: datetime.datetime
     ):
         self.sender = sender
         self.content = content
+        self.caption = caption
         self.group = group
         self.content_type = content_type
         self.time_stamp = time_stamp

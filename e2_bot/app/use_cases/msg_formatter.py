@@ -5,7 +5,6 @@ from e2_bot.domain.entities import WhatsAppMessageEntity
 from e2_bot.domain.value_objects.content_types import ContentTypes
 
 
-
 class MessageFormatter:
     @classmethod
     async def execute(cls, entity: WhatsAppMessageEntity):
@@ -24,7 +23,7 @@ class MessageFormatter:
                 formatted_msg = f"🔔 <b>{entity.group}</b>\n<i>{time_stamp}</i>\n<b>{sender_name}:</b>"
             if group:
                 from_group = group.group_name
-                formatted_msg = f"🔔 <b>{from_group}</b>\n<i>{time_stamp}</i>\n<b>{sender_name}:</b>"
-        if entity.content_type == ContentTypes.TEXT.value:
+                formatted_msg = f"🔔 <b>{from_group}</b>\n<i>{time_stamp}</i>\n<b>{sender_name}:\n</b>"
+        if entity.content_type == ContentTypes.TEXT.value or entity.content_type == ContentTypes.ETEXT.value:
             formatted_msg += f"{entity.content}"
         return formatted_msg

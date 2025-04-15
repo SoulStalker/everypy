@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 
+from loguru import logger
 
 from e2_bot.app.services.shop_service import shop_service
 from e2_bot.app.use_cases.msg_formatter import MessageFormatter
@@ -61,10 +62,11 @@ class HandlerResultsAlert:
 class HandleWhatsAppAlert:
     @classmethod
     def execute(cls, raw_data: dict):
-
+        logger.info(raw_data)
         message = WhatsAppMessageEntity(
             sender=raw_data.get("sender", ""),
             content=raw_data.get("content", ""),
+            caption=raw_data.get("caption", ""),
             group=raw_data.get("group", ""),
             content_type=raw_data.get("content_type", ""),
             time_stamp=datetime.fromisoformat(raw_data.get("timestamp")),
@@ -73,9 +75,12 @@ class HandleWhatsAppAlert:
         match message.content_type:
             case ContentTypes.TEXT.value:
                 return "text", asyncio.run(fmt.execute(message))
+            case ContentTypes.ETEXT.value:
+                return "text", asyncio.run(fmt.execute(message))
             case ContentTypes.IMAGE.value:
                 caption, filepath = message.save_media()
                 caption = asyncio.run(fmt.execute(message))
+                caption += message.caption
                 return caption, filepath
             case ContentTypes.VIDEO.value:
                 return "video", "video"
@@ -95,4 +100,3 @@ class CleanSavedMedia:
             content_type="",
             time_stamp=datetime.now())
         abc.clean_media_path()
-

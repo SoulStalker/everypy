@@ -13,3 +13,4 @@ wheels/
 credentials.json
 shops.json
 *.db
+last_ticket_id.txt
