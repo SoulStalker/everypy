@@ -5,10 +5,11 @@ import random
 from loguru import logger
 from sqlalchemy import select
 
-from otrs_service.app.constants import TgAnswer
+from otrs_service.app.constants import TgAnswer, KafkaTopics
 from otrs_service.app.db import DataAnalyzer, session_maker
 from otrs_service.app.db.models import Ticket
 from otrs_service.app.last_id import load_last_id, save_last_id
+from otrs_service.infrastructure.producer import send_message
 
 
 async def get_message(analyzer, period):
@@ -164,3 +165,16 @@ async def check_new_tickets():
 
 async def process_ticket(ticket):
     logger.info(f"Обработка тикета с ID: {ticket.id}")
+    logger.debug(ticket)
+    message = f"🆕 <b>Новая заявка в OTRS</b>\n\n📄 <b>Тикет:</b> {ticket.tn}\n📝 <b>Тема:</b> {ticket.title}\n👤 <b>Клиент:</b> {ticket.customer_user_id}"
+    send_message(KafkaTopics.TG_BOT_MSGS.value, {"command": KafkaTopics.OTRS_NEW_TICKET.name, "content": message})
+
+
+async def process_message(msg):
+    logger.info(f"Обработка сообщения: {msg}")
+    if msg["command"] == KafkaTopics.OTRS_STATS.name:
+        stats, finish = await get_stats()
+        send_message(KafkaTopics.TG_BOT_MSGS.value, {"command": KafkaTopics.OTRS_STATS.name, "content": stats})
+        send_message(KafkaTopics.TG_BOT_MSGS.value, {"command": KafkaTopics.OTRS_STATS.name, "content": finish})
+    else:
+        send_message(KafkaTopics.TG_BOT_MSGS.value, {"command": KafkaTopics.OTRS_STATS.name, "content": "Invalid command"})

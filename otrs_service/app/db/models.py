@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import declarative_base
 
-
 Base = declarative_base()
 
 
@@ -34,5 +33,5 @@ class Ticket(Base):
     change_by = Column(Integer, ForeignKey('users.id'))
     ticket_state_id = Column(Integer, ForeignKey('ticket_state.id'))
     queue_id = Column(Integer, ForeignKey('queue.id'))
-
-
+    title = Column(String)
+    customer_user_id = Column(String)

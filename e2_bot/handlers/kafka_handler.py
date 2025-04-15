@@ -74,6 +74,13 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                         bot.send_message(chat_id=chat_id, text=content),
                         loop
                     )
+            case UserCommand.OTRS_NEW_TICKET.name:
+                logger.error(f"Processing message {content}")
+                chat_id = config.tg_bot.chat_id
+                asyncio.run_coroutine_threadsafe(
+                    bot.send_message(chat_id=chat_id, text=content),
+                    loop
+                )
             case UserCommand.EQUIPMENT.name:
                 chat_id = config.tg_bot.chat_id
                 asyncio.run_coroutine_threadsafe(

@@ -35,6 +35,9 @@ services:
       - OTRS_DB_USER=${OTRS_DB_USER}
       - OTRS_DB_PASSWORD=${OTRS_DB_PASSWORD}
       - KAFKA_BROKER=${KAFKA_BROKER}
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
   bot:
     build:
       context: .
@@ -52,4 +55,3 @@ services:
       - ./sqlite_data/bot.sqlite:/app/e2_bot/bot.sqlite
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      -
