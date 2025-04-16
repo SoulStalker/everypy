@@ -130,8 +130,8 @@ async def get_stats():
     await analyzer.get_total_open_tickets()
 
     message, finish = await get_message(analyzer, 'сегодня')
-    message += f'\n\nОткрытых заявок осталось: {analyzer.total_open[0][0]}\n\n'
-    message += f'Самая старая заявка {analyzer.total_open[0][1]}'
+    message += f'<code>\n\nОткрытых заявок осталось: {analyzer.total_open[0][0]}\n\n'
+    message += f'Самая старая заявка {analyzer.total_open[0][1]}</code>'
     logger.info(message)
     logger.info(finish)
 
@@ -169,7 +169,7 @@ async def check_new_tickets():
 async def process_ticket(ticket):
     logger.info(f"Обработка тикета с ID: {ticket.id}")
     logger.debug(ticket)
-    message = f"🆕 <b>Новая заявка в OTRS</b>\n\n📄 <b>Тикет:</b> {ticket.tn}\n📝 <b>Тема:</b> {ticket.title}\n👤 <b>Клиент:</b> {ticket.customer_user_id}"
+    message = f"<code>🆕 <b>Новая заявка в OTRS</b>\n\n📄 <b>Тикет:</b> {ticket.tn}\n📝 <b>Тема:</b> {ticket.title}\n👤 <b>Клиент:</b> {ticket.customer_user_id}</code>"
     send_message(KafkaTopics.TG_BOT_MSGS.value, {"command": KafkaTopics.OTRS_NEW_TICKET.name, "content": message})
 
 
