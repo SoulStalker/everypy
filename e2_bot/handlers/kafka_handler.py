@@ -80,38 +80,10 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
 
                     case ContentTypes.IMAGE.value:
                         photo = FSInputFile(data)
-                        future = asyncio.run_coroutine_threadsafe(
-                            bot.send_photo(
-                                chat_id=chat_id,
-                                photo=photo,
-                                caption=caption,
-                                show_caption_above_media=True,
-                            ),
-                            loop
-                        )
-                        try:
-                            future.result(timeout=15)
-                        except asyncio.TimeoutError:
-                            logger.error("Таймаут при отправке фото.")
-                        except Exception as e:
-                            logger.error(f"Ошибка: {e}")
+                        tg_sender.send_photo(chat_id=chat_id, photo=photo, caption=caption)
                     case ContentTypes.VIDEO.value:
                         video = FSInputFile(data)
-                        future = asyncio.run_coroutine_threadsafe(
-                            bot.send_video(
-                                chat_id=chat_id,
-                                video=video,
-                                caption=caption,
-                                show_caption_above_media=True,
-                            ),
-                            loop
-                        )
-                        try:
-                            future.result(timeout=15)
-                        except asyncio.TimeoutError:
-                            logger.error("Таймаут при отправке фото.")
-                        except Exception as e:
-                            logger.error(f"Ошибка: {e}")
+                        tg_sender.send_video(chat_id=chat_id, video=video, caption=caption)
                     case _:
                         logger.error(f"Unknown message type: {ct}")
             case _:
