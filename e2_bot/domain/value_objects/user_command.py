@@ -12,3 +12,4 @@ class UserCommand(Enum):
     OTRS_STATS = "/otrs_stats"
     EQUIPMENT = "/equipment"
     OTRS_NEW_TICKET = "/otrs_new_ticket"
+    WS = "/whatsapp"

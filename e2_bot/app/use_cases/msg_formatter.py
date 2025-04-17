@@ -1,8 +1,8 @@
 from e2_bot.app.data_access import WAContactRepository, WAGroupRepository
 from e2_bot.app.data_access.local_db import session_maker
-from e2_bot.app.use_cases import GetModelUseCase
 from e2_bot.domain.entities import WhatsAppMessageEntity
 from e2_bot.domain.value_objects.content_types import ContentTypes
+from .wa_groups import GetModelUseCase
 
 
 class MessageFormatter:

@@ -29,16 +29,16 @@ class WhatsAppMessageEntity:
         caption = f"Сообщение в группе {self.group}\n[{self.time_stamp.strftime('%d.%m.%Y, %H:%M:%S')}] {self.sender}:"
         """Декодирует base64 и сохраняет в папку media. Возвращает путь к файлу."""
         try:
-            # 1. Создаем папку, если ее нет
+            # Создаем папку, если ее нет
             self.media_dir.mkdir(exist_ok=True)
-            # 2. Генерируем уникальное имя файла
+            # Генерируем уникальное имя файла
             filename = (
                 f"{self.time_stamp.strftime('%Y%m%d_%H%M%S')}"
-                f"_{self.sender.replace(' ', '_')}.jpg"  # или другой формат
+                f"_{self.sender.replace(' ', '_')}"
             )
-            # 3. Декодируем base64
+            # Декодируем base64
             media_bytes = base64.b64decode(self.content)
-            # 4. Сохраняем файл
+            # Сохраняем файл
             filepath = self.media_dir / filename
             with open(filepath, "wb") as f:
                 f.write(media_bytes)
