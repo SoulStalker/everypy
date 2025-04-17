@@ -151,7 +151,6 @@ async def get_stats():
 
 
 async def check_new_tickets():
-    queue_ids = [1, 4]
     last_id = load_last_id()
     async with session_maker() as session:
         result = await session.execute(
