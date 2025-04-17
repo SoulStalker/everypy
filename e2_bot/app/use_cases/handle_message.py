@@ -18,6 +18,11 @@ class MessageHandler(ABC):
         pass
 
 
+class DefaultMessageHandler(MessageHandler, ABC):
+    async def execute(self, message: dict) -> str:
+        return message.get("content", "")
+
+
 class UCMessageHandler(MessageHandler, ABC):
     async def execute(self, raw_data: dict):
         shop_id = raw_data["store_id"]

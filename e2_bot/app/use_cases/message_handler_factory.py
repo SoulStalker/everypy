@@ -1,4 +1,4 @@
-from e2_bot.app.use_cases import UCMessageHandler, WSMessageHandler, TotalMessageHandler, MessageHandler, ResultsMessageHandler
+from e2_bot.app.use_cases import UCMessageHandler, WSMessageHandler, TotalMessageHandler, MessageHandler, ResultsMessageHandler, DefaultMessageHandler
 from e2_bot.domain.value_objects import UserCommand
 
 
@@ -8,6 +8,9 @@ class MessageHandlerFactory:
         UserCommand.TOTAL.name: TotalMessageHandler,
         UserCommand.RESULTS_BY_SHOP.name: ResultsMessageHandler,
         UserCommand.WS.name: WSMessageHandler,
+        UserCommand.OTRS_STATS.name: DefaultMessageHandler,
+        UserCommand.EQUIPMENT.name: DefaultMessageHandler,
+        UserCommand.OTRS_NEW_TICKET.name: DefaultMessageHandler,
     }
 
     @classmethod

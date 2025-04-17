@@ -5,6 +5,7 @@ from .handle_message import (
     TotalMessageHandler,
     ResultsMessageHandler,
     WSMessageHandler,
+    DefaultMessageHandler
 )
 from .wa_groups import AddGroupUseCase, GetModelUseCase, AddContactUseCase
 
@@ -18,4 +19,5 @@ __all__ = [
     'TotalMessageHandler',
     'ResultsMessageHandler',
     'WSMessageHandler',
+    'DefaultMessageHandler',
 ]
