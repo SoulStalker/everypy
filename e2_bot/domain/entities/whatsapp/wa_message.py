@@ -61,5 +61,5 @@ class WhatsAppMessageEntity:
     def format(self):
         sender = self.sender.split("@")[0]
         time_stamp = self.time_stamp.strftime("%d.%m.%Y, %H:%M:%S")
-        formatted_msg = f"Сообщение в группе {self.group}\n[{time_stamp}] {sender}: {self.content}"
+        formatted_msg = f"Сообщение в группе {self.group}\n[{time_stamp}] <code>{sender}</code>: {self.content}"
         return formatted_msg

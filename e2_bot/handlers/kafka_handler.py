@@ -8,6 +8,7 @@ from e2_bot.app.constants import TgAnswer
 from e2_bot.app.use_cases.funny.send_fun import send_funny
 from e2_bot.app.use_cases.handle_message import HandleIncomingAlert, HandleTotalAlert, HandlerResultsAlert, HandleWhatsAppAlert
 from e2_bot.configs import load_config
+from e2_bot.domain.value_objects.content_types import ContentTypes
 from e2_bot.domain.value_objects.user_command import UserCommand
 from e2_bot.lexicon import LEXICON
 
@@ -19,7 +20,9 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
         chat_id = message.get("chat_id", config.tg_bot.chat_id)
         cmd = message.get("command", "WS")
         content = message.get("content")
-        logger.debug(f"Received message: {chat_id} {cmd}, {content[:30]}")
+        logger.debug(f"Received message: {chat_id} {cmd}")
+        logger.info(f"Message struct: {message.keys()}")
+        logger.info(f"Message: {message}")
         match cmd:
             case UserCommand.UNCLOSED.name:
                 shifts_from_kafka = dict(message.get("content", "Пустое сообщение"))
@@ -35,7 +38,7 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                 if chat_id:
                     for data in shifts_from_kafka.items():
                         payload = {"store_id": data[0], "cashes": data[1]}
-                        formatted_shift = hia.execute(payload)
+                        formatted_shift = asyncio.run(hia.execute(payload))
                         asyncio.run_coroutine_threadsafe(
                             bot.send_message(chat_id=chat_id, text=formatted_shift),
                             loop
@@ -91,6 +94,16 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                 hwa = HandleWhatsAppAlert()
                 caption, image_path = hwa.execute(message)
                 logger.info(f"caption: {caption}, image_path: {image_path}")
+                ct = message.get("content_type")
+                match ct:
+                    case ContentTypes.TEXT.value | ContentTypes.ETEXT.value:
+                        logger.info(f"Message text: {ct}")
+                    case ContentTypes.IMAGE.value:
+                        logger.info(f"Message image: {image_path}")
+                    case ContentTypes.VIDEO.value:
+                        logger.info(f"Message video: {image_path}")
+                    case _:
+                        logger.error(f"Unknown message type: {ct}")
                 if caption == "text":
                     asyncio.run_coroutine_threadsafe(
                         bot.send_message(chat_id=chat_id, text=image_path),
@@ -114,6 +127,7 @@ def build_kafka_handler(bot: Bot, loop: asyncio.AbstractEventLoop):
                     except Exception as e:
                         logger.error(f"Ошибка: {e}")
                 else:
+                    logger.warning(f"message content type is {message.get('content_type', '')}")
                     photo = FSInputFile(image_path)
                     future = asyncio.run_coroutine_threadsafe(
                         bot.send_photo(

@@ -5,21 +5,20 @@ from loguru import logger
 
 from e2_bot.app.services.shop_service import shop_service
 from e2_bot.app.use_cases.msg_formatter import MessageFormatter
-from e2_bot.domain.entities import USMessageEntity, TotalMessageEntity, ShopResultEntity, WhatsAppMessageEntity
+from e2_bot.domain.entities import WhatsAppMessageEntity
+from e2_bot.domain.entities.sales import TotalMessageFormatter, ShopResuFormatter
+from e2_bot.domain.entities.shifts import USMessageFormatter
 from e2_bot.domain.value_objects.content_types import ContentTypes
 
 
 class HandleIncomingAlert:
     @classmethod
-    def execute(cls, raw_data: dict):
+    async def execute(cls, raw_data: dict):
         shop_id = raw_data["store_id"]
         cashes = raw_data["cashes"]
-        shop = shop_service.get(shop_id)
-        message = USMessageEntity(
-            shop_number=shop_id,
-            cashes=cashes,
-        )
-        return message.format(shop)
+        shop = await shop_service.get(shop_id)
+        USMessageFormatter().format(cashes, shop)
+        return USMessageFormatter().format(cashes, shop)
 
 
 class HandleTotalAlert:
@@ -28,10 +27,7 @@ class HandleTotalAlert:
         sum_by_checks = raw_data["sum_by_checks"]
         checks_count = raw_data["checks_count"]
         state = raw_data["state"]
-        message = TotalMessageEntity(
-            sum_by_checks, checks_count, state
-        )
-        return message.format()
+        return TotalMessageFormatter().format(sum_by_checks, checks_count, state)
 
 
 class HandlerResultsAlert:
@@ -40,12 +36,11 @@ class HandlerResultsAlert:
         shop_id = raw_data["store_id"]
         results = raw_data["results"]
         if shop_id == "total_summary":
-            message = TotalMessageEntity(
+            return TotalMessageFormatter().format(
                 sum_by_checks=results["sum_by_checks"],
                 checks_count=results["checks_count"],
                 state=results["state"],
             )
-            return message.format()
         else:
             shop = shop_service.get(shop_id)
             results = raw_data["results"]
@@ -53,10 +48,7 @@ class HandlerResultsAlert:
             sum_by_checks = results["sum_by_checks"]
             checks_count = results["checks_count"]
             state = results["state"]
-            message = ShopResultEntity(
-                sum_by_checks, checks_count, state
-            )
-        return message.format(shop)
+        return ShopResuFormatter().format(shop, sum_by_checks, checks_count, state)
 
 
 class HandleWhatsAppAlert:

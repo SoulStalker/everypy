@@ -14,7 +14,7 @@ class ShopService:
     def __init__(self, repository: IShopRepository):
         self.repository = repository
 
-    def get(self, number: int):
+    async def get(self, number: int):
         return self.repository.get(number)
 
 

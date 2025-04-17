@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 
-
 from e2_bot.domain.entities import ShopEntity
 
 
@@ -12,12 +11,20 @@ class USMessageEntity:
     shop_number: int
     cashes: [int]
 
-    def format(self, shop: ShopEntity):
-        cashes = ", ".join(map(str, self.cashes))
+
+@dataclass
+class USMessageFormatter:
+    """
+    Сущность для хранения данных о не закрытых сменах
+    """
+
+    @staticmethod
+    def format(cashes: list, shop: ShopEntity):
+        cashes = ", ".join(map(str, cashes))
         if shop:
-            if len(self.cashes) == 0:
+            if len(cashes) == 0:
                 formatted_msg, status = "<i>Все смены закрыты</i>"
-            elif len(self.cashes) == 1:
+            elif len(cashes) == 1:
                 formatted_msg = f"<i>{shop.name},\nне закрыта смена на кассе {cashes}</i>"
             else:
                 formatted_msg = f"<i>{shop.name},\nне закрыта смена на кассах {cashes}</i>"
