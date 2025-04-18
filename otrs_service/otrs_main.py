@@ -11,6 +11,7 @@ config = load_config('.env')
 
 
 async def main():
+    # Планировщик проверяет новые таски otrs
     scheduler = AsyncIOScheduler()
     scheduler.add_job(check_new_tickets, 'interval', minutes=5)
     scheduler.start()

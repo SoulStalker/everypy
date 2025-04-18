@@ -1,5 +1,7 @@
+version: '3'
 services:
   csi:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile_csi
@@ -13,6 +15,7 @@ services:
       - KAFKA_BROKER=${KAFKA_BROKER}
       - CHAT_ID=${CHAT_ID}
   gs:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile_gs
@@ -24,6 +27,7 @@ services:
       - SHEET_NAME=${SHEET_NAME}
       - LIST_NAME=${LIST_NAME}
   otrs:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile_otrs
@@ -38,7 +42,9 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+      - ./data/last_ticket_id.txt:/app/last_ticket_id.txt
   bot:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile_bot

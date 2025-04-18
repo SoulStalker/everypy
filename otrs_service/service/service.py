@@ -166,6 +166,7 @@ async def check_new_tickets():
 
 
 async def process_ticket(ticket):
+    # Сообщение о новой заявке
     logger.info(f"Обработка тикета с ID: {ticket.id}")
     logger.debug(ticket)
     message = f"<code>🆕 <b>Новая заявка в OTRS</b>\n\n📄 <b>Тикет:</b> {ticket.tn}\n📝 <b>Тема:</b> {ticket.title}\n👤 <b>Клиент:</b> {ticket.customer_user_id}</code>"
@@ -173,6 +174,7 @@ async def process_ticket(ticket):
 
 
 async def process_message(msg):
+    # Отправка подготовленного сообщения в kafka
     logger.info(f"Обработка сообщения: {msg}")
     if msg["command"] == KafkaTopics.OTRS_STATS.name:
         stats, finish = await get_stats()
