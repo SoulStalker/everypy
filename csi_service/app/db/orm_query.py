@@ -2,47 +2,76 @@ from collections import defaultdict
 from datetime import date, timedelta
 from typing import Any, Sequence
 
-from sqlalchemy import select, Row, RowMapping, func, case
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func, case
 
+from .engine import session_maker  # import session factory
 from .models import Shifts, Purchases
 
 
-# # Функция возвращает пользователя по его telegram ID
-# async def orm_get_user_by_id(session: AsyncSession, user_id: int) -> User:
-#     query = select(User).where(User.username == user_id)
-#     users = await session.execute(query)
-#     user = users.scalars().first()
-#     return user
+async def get_unclosed_shifts(report_day: date = date.today()) -> Sequence[Shifts]:
+    """
+    Возвращает список незакрытых смен за текущий или предыдущий день.
+    """
+    async with session_maker() as session:  # автоматически закроет сессию
+        query = (
+            select(Shifts)
+            .where(
+                (Shifts.operday >= report_day - timedelta(days=1)) &
+                (Shifts.state == 0)
+            )
+            .order_by(Shifts.shopindex)
+        )
+        result = await session.execute(query)
+        return result.scalars().all()
 
 
-# Функция получает список незакрытых смен за текущий день
-async def get_unclosed_shifts(session: AsyncSession) -> Sequence[Row[Any] | RowMapping | Any]:
-    query = select(Shifts).where(
-        (Shifts.operday >= date.today() - timedelta(days=1)) & (Shifts.state == 0)).order_by(Shifts.shopindex)
-    shifts = await session.execute(query)
-    shifts = shifts.scalars().all()
-    return shifts
+async def get_results_by_shop(report_day: date = date.today()) -> dict[int, Any]:
+    """
+    Возвращает словарь с результатами по каждому магазину и общую сводку.
+    Формат: {shop_index: {'sum_by_checks': float, 'checks_count': int, 'state': str}, ..., 'total_summary': {...}}
+    """
+    async with session_maker() as session:
+        stmt = (
+            select(
+                Shifts.shopindex,
+                Shifts.cashnum,
+                Shifts.numshift,
+                Shifts.operday,
+                Shifts.state,
+                Shifts.inn,
+                func.count(
+                    case((Purchases.cash_operation == 0, Purchases.checksumstart))
+                ).label('check_count'),
+                func.sum(
+                    case(
+                        (Purchases.operationtype, Purchases.checksumend),
+                        (~Purchases.operationtype, -Purchases.checksumend)
+                    )
+                ).label('sum_by_checks')
+            )
+            .join(Purchases)
+            .where(
+                Shifts.operday == report_day,
+                Purchases.checkstatus == 0
+            )
+            .group_by(
+                Shifts.shopindex,
+                Shifts.cashnum,
+                Shifts.numshift,
+                Shifts.operday,
+                Shifts.state,
+                Shifts.inn
+            )
+            .order_by(Shifts.shopindex, Shifts.cashnum)
+        )
 
-
-# Функция получает список смен с результатами продаж
-async def get_results_by_shop(session: AsyncSession, report_day=date.today()):
-    results_today = []
-    async with session as async_session:
-        stmt = select(Shifts.shopindex, Shifts.cashnum, Shifts.numshift, Shifts.operday, Shifts.state, Shifts.inn,
-                      func.count(case((Purchases.cash_operation == 0, Purchases.checksumstart), else_=None)).label('check_count'),
-                      func.sum(case((Purchases.operationtype, Purchases.checksumend), (~Purchases.operationtype, -Purchases.checksumend),
-                                    else_=None)).label('sum_by_checks'))
-
-        stmt = stmt.join(Purchases).filter(Shifts.operday == report_day, Purchases.checkstatus == 0)
-        stmt = stmt.group_by(Shifts.cashnum, Shifts.shopindex, Shifts.numshift, Shifts.operday, Shifts.state, Shifts.inn)
-        stmt = stmt.order_by(Shifts.shopindex, Shifts.cashnum)
-        result = await async_session.execute(stmt)
-
+        result = await session.execute(stmt)
         rows = result.fetchall()
 
+        # Собираем отдельные записи
+        results_today = []
         for row in rows:
-            shift = {
+            results_today.append({
                 'shop_index': row[0],
                 'cash_num': row[1],
                 'num_shift': row[2],
@@ -50,30 +79,39 @@ async def get_results_by_shop(session: AsyncSession, report_day=date.today()):
                 'state': row[4],
                 'inn': row[5],
                 'checks_count': row[6],
-                'sum_by_checks': row[7]/100,
+                'sum_by_checks': row[7] / 100.0,
+            })
+
+        # Объединяем по магазину
+        combined: dict[int, dict[str, Any]] = defaultdict(lambda: {
+            'sum_by_checks': 0.0,
+            'checks_count': 0,
+            'state': set()
+        })
+        for rec in results_today:
+            idx = rec['shop_index']
+            combined[idx]['sum_by_checks'] += rec['sum_by_checks']
+            combined[idx]['checks_count'] += rec['checks_count']
+            combined[idx]['state'].add(rec['state'])
+
+        # Формируем итоговую сводку
+        total_summary = {
+            'sum_by_checks': sum(v['sum_by_checks'] for v in combined.values()),
+            'checks_count': sum(v['checks_count'] for v in combined.values()),
+            'state': set()
+        }
+        for v in combined.values():
+            total_summary['state'].update(v['state'])
+
+        combined['total_summary'] = total_summary
+
+        # Приводим state к строке
+        result_dict: dict[int, dict[str, Any]] = {}
+        for k, v in combined.items():
+            result_dict[k] = {
+                'sum_by_checks': v['sum_by_checks'],
+                'checks_count': v['checks_count'],
+                'state': str(v['state'])
             }
-            results_today.append(shift)
 
-        combined_dict = defaultdict(lambda: {'sum_by_checks': 0, 'checks_count': 0, 'state': set()})
-
-        for shift in results_today:
-            shop_index = shift['shop_index']
-            combined_dict[shop_index]['sum_by_checks'] += float(shift['sum_by_checks'])
-            combined_dict[shop_index]['checks_count'] += shift['checks_count']
-            combined_dict[shop_index]['state'].add(shift['state'])
-
-        combined_dict = dict(combined_dict)
-
-        total_sum = sum(item['sum_by_checks'] for item in combined_dict.values())
-        total_checks = sum(item['checks_count'] for item in combined_dict.values())
-
-        total_summary = {'sum_by_checks': float(total_sum), 'checks_count': total_checks, 'state': set()}
-
-        for item in combined_dict.values():
-            total_summary['state'].update(item['state'])
-
-        combined_dict['total_summary'] = total_summary
-        for k, v in combined_dict.items():
-            v["state"] = str(v["state"])
-    return combined_dict
-
+        return result_dict
