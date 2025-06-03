@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import date, timedelta
+from decimal import Decimal
 from typing import Any, Sequence
 
 from sqlalchemy import select, func, case
@@ -79,7 +80,7 @@ async def get_results_by_shop(report_day: date = date.today()) -> dict[int, Any]
                 'state': row[4],
                 'inn': row[5],
                 'checks_count': row[6],
-                'sum_by_checks': row[7] / 100.0,
+                'sum_by_checks': float(row[7] / Decimal('100')),
             })
 
         # Объединяем по магазину
